@@ -1,16 +1,24 @@
+import threading
 import time
-import explorerhat
 
-from industrial_inf_assigment.button_input import ButtonInput
-from industrial_inf_assigment.orchestrator_rpi import Orchestrator
+from industrial_inf_assigment.orchestrator_status import OrchestratorStatus
+from industrial_inf_assigment.status_code import StatusCode
 
-orchestrator = Orchestrator()
+orchStatus = OrchestratorStatus()
+orchStatus.changeColor(StatusCode.IDLE)
 
-buttonInput = ButtonInput(orchestrator)
+thread_tire1 = threading.Thread(target=orchStatus.blink, args=())
 
-explorerhat.touch.pressed(buttonInput.changeState)
+thread_tire1.start
 
-while True:
-    time.sleep(1)
+print("Now sleep")
+time.sleep(5)
+print("Sleep Over")
 
-explorerhat.pause()
+orchStatus.changeColor(StatusCode.WORKING)
+
+print("Now sleep")
+time.sleep(5)
+print("Sleep Over")
+
+orchStatus.changeColor(StatusCode.ERROR)

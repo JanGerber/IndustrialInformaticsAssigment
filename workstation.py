@@ -1,6 +1,7 @@
 import uuid
 
 from industrial_inf_assigment.conveyor import Conveyor
+from industrial_inf_assigment.pallet import Pallet
 from industrial_inf_assigment.robot import Robot
 
 
