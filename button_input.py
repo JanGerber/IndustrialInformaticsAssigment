@@ -9,14 +9,20 @@ from industrial_inf_assigment.phone_shape import PhoneShape
 class ButtonInput:
 
     def __init__(self, orchestrator: Orchestrator):
-        self.phone: Phone = Phone()
+        self.phone = Phone(PhoneShape.FRAME_1, PhoneColor.RED, PhoneShape.KEYBOARD_1, PhoneColor.RED,
+                           PhoneShape.SCREEN_1, PhoneColor.RED)
         self.state = 0
         self.selected = False
         self.orchestrator = orchestrator
         print("New Button Input Service initiated")
 
     def changeState(self, channel, event):
+
+        print("Button pressed")
+        print(channel)
+        print(event)
         if self.state == 0:
+            print("State 0")
             if channel == 4:
                 self.state = 1
         elif self.state == 1:
@@ -38,6 +44,7 @@ class ButtonInput:
                 self.state = 0
 
     def state1(self, channel):
+        print("State 1")
         if channel == 4 and self.selected:
             self.state = 2
             self.resetLight()
@@ -56,8 +63,9 @@ class ButtonInput:
             self.selected = True
 
     def state2(self, channel):
+        print("State 2")
         if channel == 4 and self.selected:
-            self.state = 2
+            self.state = 3
             self.resetLight()
             self.selected = False
         elif channel == 1:
@@ -74,8 +82,9 @@ class ButtonInput:
             self.selected = True
 
     def state3(self, channel):
+        print("State 3")
         if channel == 4 and self.selected:
-            self.state = 2
+            self.state = 4
             self.resetLight()
             self.selected = False
         elif channel == 1:
@@ -92,8 +101,9 @@ class ButtonInput:
             self.selected = True
 
     def state4(self, channel):
+        print("State 4")
         if channel == 4 and self.selected:
-            self.state = 2
+            self.state = 5
             self.resetLight()
             self.selected = False
         elif channel == 1:
@@ -110,8 +120,9 @@ class ButtonInput:
             self.selected = True
 
     def state5(self, channel):
+        print("State 5")
         if channel == 4 and self.selected:
-            self.state = 2
+            self.state = 6
             self.resetLight()
             self.selected = False
         elif channel == 1:
@@ -128,8 +139,9 @@ class ButtonInput:
             self.selected = True
 
     def state6(self, channel):
+        print("State 6")
         if channel == 4 and self.selected:
-            self.state = 2
+            self.state = 7
             self.allLights()
             self.selected = False
         elif channel == 1:
@@ -149,14 +161,15 @@ class ButtonInput:
         self.state = 0
 
     def changeLight(self, param: int):
-        explorerhat.light[param].off()
+        self.resetLight()
+        explorerhat.light[param - 1].on()
 
     def resetLight(self):
+        explorerhat.light[0].off()
         explorerhat.light[1].off()
         explorerhat.light[2].off()
-        explorerhat.light[3].off()
 
     def allLights(self):
+        explorerhat.light[0].on()
         explorerhat.light[1].on()
         explorerhat.light[2].on()
-        explorerhat.light[3].on()

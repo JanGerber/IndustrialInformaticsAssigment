@@ -1,4 +1,7 @@
 import uuid
+import json
+
+import requests
 
 
 class Conveyor:
@@ -8,3 +11,20 @@ class Conveyor:
         self.hostIP = hostIP
         self.baseService = "/rest/services"
         print("New Conveyor initiated (" + str(self.robotID) + ")")
+
+    def movePallet(self, zoneStart: int, zoneEnd: int):
+        url = self.hostIP + self.baseService + "/TransZone" + str(zoneStart) + str(zoneEnd)
+        r = requests.post(url, json={"destUrl": ""})
+        if r.status_code == 202:
+            print("Successful")
+        else:
+            print("Something went wrong!!")
+
+    def getZoneStatus(self, zoneNumber: int):
+        url = self.hostIP + self.baseService + "/Zone" + str(zoneNumber)
+        r = requests.post(url, json={"destUrl": ""})
+
+        reqMsg = json.loads(r.text)
+        palletID = reqMsg["PalletID"]
+
+        return palletID

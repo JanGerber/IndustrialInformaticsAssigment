@@ -1,0 +1,14 @@
+robotEvent
+    id
+    time
+    event
+    fkRobotId
+
+robot
+    id
+    manufacturer
+    dof
+    operation
+
+
+
