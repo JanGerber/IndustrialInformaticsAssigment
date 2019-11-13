@@ -1,5 +1,5 @@
-import uuid
 import json
+import uuid
 
 import requests
 
@@ -10,7 +10,7 @@ class Conveyor:
         self.conveyorID = uuid.uuid4()
         self.hostIP = hostIP
         self.baseService = "/rest/services"
-        print("New Conveyor initiated (" + str(self.robotID) + ")")
+        print("New Conveyor initiated (" + str(self.conveyorID) + ")")
 
     def movePallet(self, zoneStart: int, zoneEnd: int):
         url = self.hostIP + self.baseService + "/TransZone" + str(zoneStart) + str(zoneEnd)
