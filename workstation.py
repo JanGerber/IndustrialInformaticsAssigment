@@ -1,7 +1,6 @@
 import uuid
 
 from industrial_inf_assigment.conveyor import Conveyor
-from industrial_inf_assigment.pallet import Pallet
 from industrial_inf_assigment.robot import Robot
 
 
@@ -28,9 +27,3 @@ class Workstation:
         else:
             print("The workstation don't contains any pallet!")
             return
-
-    def displayPallets(self):
-        print("Workstation (" + str(self.workstationID) + ") Pallets:")
-        p: Pallet
-        for p in self.pallets:
-            p.printPalletInfo()

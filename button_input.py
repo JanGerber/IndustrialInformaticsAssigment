@@ -17,7 +17,6 @@ class ButtonInput:
         print("New Button Input Service initiated")
 
     def changeState(self, channel, event):
-
         print("Button pressed")
         print(channel)
         print(event)
