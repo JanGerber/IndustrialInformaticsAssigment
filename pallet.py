@@ -1,7 +1,7 @@
 import uuid
 
-from industrial_inf_assigment.phone import Phone
 from industrial_inf_assigment.workstation import Workstation
+from industrial_inf_assigment.phone import Phone
 from industrial_inf_assigment.zone import Zone
 
 
@@ -12,6 +12,9 @@ class Pallet:
         self.phone = phone
         self.locationWS = locationWS
         self.locationZone = locationZone
+        self.frameDone = False
+        self.screenDone = False
+        self.keyboardDone = False
         print("New pallet initiated (" + str(self.palletID) + ")")
 
     def printPalletInfo(self):
