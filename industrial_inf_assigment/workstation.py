@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from industrial_inf_assigment.conveyor import Conveyor
@@ -11,8 +12,9 @@ class Workstation:
         self.robot = Robot(baseIp + ".1")
         self.conveyor = Conveyor(baseIp + ".2")
         self.pallets = []
+        self.baseIp = baseIp
         self.nextWS = nextWS
-        print("New workstation initiated (" + str(self.workstationID) + ")")
+        logging.debug("Initialization: new workstation  (" + str(self.workstationID) + ")")
 
     def addPallet(self, pallet):
         if len(self.pallets) >= 5:
@@ -28,3 +30,6 @@ class Workstation:
         else:
             print("The workstation don't contains any pallet!")
             return
+
+    def getUUID(self) -> str:
+        return str(self.workstationID)
