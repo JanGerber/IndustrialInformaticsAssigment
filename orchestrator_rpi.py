@@ -3,7 +3,7 @@ import uuid
 from industrial_inf_assigment.phone import Phone
 
 
-class Orchestrator:
+class Orchestrator():
 
     def __init__(self):
         self.orchestratorID = uuid.uuid4()
@@ -17,3 +17,9 @@ class Orchestrator:
         if self.bufferOrder.count() >= 2:
             return
         self.bufferOrder.append(phone)
+
+    def penSelectedEndEvent(self):
+        print("End Event Change Pen")
+
+    def penSelectedStartEvent(self):
+        print("Start Change Pen")

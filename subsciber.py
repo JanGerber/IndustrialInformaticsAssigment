@@ -7,24 +7,38 @@ class Subscriber:
     def __init__(self, ownAdress):
         self.ownAdress = ownAdress
         self.baseService = "/rest/events"
-        self.port = ":8080"
+        self.port = ""
 
-    def subscribeToZoneChange(self, hostIP, zone: Zone):
+    def subscribeToZoneChange(self, hostIP, zone: Zone, endpoint):
         url = hostIP + self.port + self.baseService + "/Z" + str(zone.value) + "_Changed/notifs"
-        r = requests.post(url, json={"destUrl": self.ownIP})
+        destUrl = self.ownAdress + endpoint
+        r = requests.post(url, json={"destUrl": destUrl})
+        print(r.status_code)
 
-    def subscribeToPenChangeStart(self, hostIP):
+    def subscribeToPenChangeStart(self, hostIP, endpoint):
         url = hostIP + self.port + self.baseService + "/PenChangeStarted/notifs"
-        r = requests.post(url, json={"destUrl": self.ownIP})
+        destUrl = self.ownAdress + endpoint
+        r = requests.post(url, json={"destUrl": destUrl})
+        print(r.status_code)
+        print("Subscribed to PenChangeStart")
 
-    def subscribeToPenChangeEnd(self, hostIP):
-        url = hostIP + self.port + self.baseService + "/PenChangeEnd/notifs"
-        r = requests.post(url, json={"destUrl": self.ownIP})
+    def subscribeToPenChangeEnd(self, hostIP, endpoint):
+        url = hostIP + self.port + self.baseService + "/PenChangeEnded/notifs"
+        destUrl = self.ownAdress + endpoint
+        r = requests.post(url, json={"destUrl": destUrl})
+        print(r.status_code)
+        print("Subscribed to PenChangeEnd")
 
-    def subscribeToDrawingStart(self, hostIP):
+    def subscribeToDrawingStart(self, hostIP, endpoint):
         url = hostIP + self.port + self.baseService + "/DrawStartExecution/notifs"
-        r = requests.post(url, json={"destUrl": self.ownIP})
+        destUrl = self.ownAdress + endpoint
+        r = requests.post(url, json={"destUrl": destUrl})
+        print(r.status_code)
+        print("Subscribed to Drawing Start")
 
-    def subscribeToDrawingEnd(self, hostIP):
+    def subscribeToDrawingEnd(self, hostIP, endpoint):
         url = hostIP + self.port + self.baseService + "/DrawEndExecution/notifs"
-        r = requests.post(url, json={"destUrl": self.ownIP})
+        destUrl = self.ownAdress + endpoint
+        r = requests.post(url, json={"destUrl": destUrl})
+        print(r.status_code)
+        print("Subscribed to Drawing End")

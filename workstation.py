@@ -6,12 +6,13 @@ from industrial_inf_assigment.robot import Robot
 
 class Workstation:
 
-    def __init__(self, baseIp):
-        self.orchestratorID = uuid.uuid4()
+    def __init__(self, baseIp, nextWS):
+        self.workstationID = uuid.uuid4()
         self.robot = Robot(baseIp + ".1")
         self.conveyor = Conveyor(baseIp + ".2")
         self.pallets = []
-        print("New orchestrator initiated (" + str(self.orchestratorID) + ")")
+        self.nextWS = nextWS
+        print("New workstation initiated (" + str(self.workstationID) + ")")
 
     def addPallet(self, pallet):
         if len(self.pallets) >= 5:
