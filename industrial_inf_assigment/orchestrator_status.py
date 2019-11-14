@@ -8,16 +8,17 @@ class OrchestratorStatus:
 
     def __init__(self):
         self.status = StatusCode.IDLE
+        self.changeColor(self.status)
         print("New orchestrator status initiated ")
 
     def blink(self):
+        print("Status Code Routine")
         while True:
-            if self.color == StatusCode.WORKING:  # green blinking
+            if self.status == StatusCode.WORKING:  # green blinking
                 explorerhat.light[3].on()
-                time.sleep(0.5)
+                time.sleep(1)
                 explorerhat.light[3].off()
-
-        time.sleep(0.5)
+            time.sleep(1)
 
     def changeColor(self, status: StatusCode):
         self.status = status
