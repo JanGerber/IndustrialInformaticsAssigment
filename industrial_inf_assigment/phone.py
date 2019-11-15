@@ -6,6 +6,3 @@ class Phone:
         self.keyboardColor = keyboadColor
         self.screenShape = screenShape
         self.screenColor = screenColor
-
-    def print(self):
-        print(self)

@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from industrial_inf_assigment.workstation import Workstation
@@ -15,7 +16,7 @@ class Pallet:
         self.frameDone = False
         self.screenDone = False
         self.keyboardDone = False
-        print("New pallet initiated (" + str(self.palletID) + ")")
+        logging.debug("Initialization: new pallet  (" + str(self.palletID) + ")")
 
     def printPalletInfo(self):
-        print("\tPalletID:" + str(self.palletID))
+        logging.info("Pallet: \tpalletID:" + str(self.palletID))

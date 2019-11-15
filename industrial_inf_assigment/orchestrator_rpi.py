@@ -1,3 +1,4 @@
+import logging
 import time
 import uuid
 
@@ -12,16 +13,16 @@ class Orchestrator():
         self.orchestratorID = uuid.uuid4()
         self.bufferOrder = []
         self.status = orchestratorStatus
-        print("New orchestrator initiated (" + str(self.orchestratorID) + ")")
+        logging.debug("Initialization: new orchestrator  (" + str(self.orchestratorID) + ")")
 
     def runOrchestation(self):
         while True:
             time.sleep(20)
-            print("Orchestration")
+            logging.info("Orchestrator: orchestrate")
 
 
     def addNewOrder(self, phone: Phone):
-        print("New Phone Added to Orch")
+        logging.info("Orchestrator: new phone added to order list")
 
     def addOrderToBuffer(self, phone: Phone):
         if self.bufferOrder.count() >= 2:
@@ -29,9 +30,7 @@ class Orchestrator():
         self.bufferOrder.append(phone)
 
     def penSelectedEndEvent(self):
-        print("End Event Change Pen")
         self.status.changeColor(StatusCode.IDLE)
 
     def penSelectedStartEvent(self):
-        print("Start Change Pen")
         self.status.changeColor(StatusCode.WORKING)

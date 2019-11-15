@@ -1,3 +1,4 @@
+import logging
 import time
 import explorerhat
 
@@ -9,10 +10,9 @@ class OrchestratorStatus:
     def __init__(self):
         self.status = StatusCode.IDLE
         self.changeColor(self.status)
-        print("New orchestrator status initiated ")
 
     def blink(self):
-        print("Status Code Routine")
+        logging.debug("Thread: Status Code Routine Started")
         while True:
             if self.status == StatusCode.WORKING:  # green blinking
                 explorerhat.light[3].on()

@@ -1,3 +1,4 @@
+import logging
 import time
 
 import explorerhat
@@ -17,11 +18,10 @@ class OrchestratorInput:
         self.selected = False
         self.orchestrator = orchestrator
         self.okButton = 1
-        print("New Orchestrator Input Service initiated")
 
     def startListening(self):
         explorerhat.touch.pressed(self.changeState)
-        print("Start Listening to Button Inputs")
+        logging.debug("Thread: listening to button inputs started")
         while True:
             if self.state == 0:
                 explorerhat.light[0].off()
@@ -40,11 +40,9 @@ class OrchestratorInput:
                 explorerhat.light[0].off()
                 time.sleep(0.6)
 
-
     def changeState(self, channel, event):
-        print("Button pressed: " + channel)
+        logging.debug("OrchestratorInput: Button pressed: " + str(channel))
         if self.state == 0:
-            print("State 0")
             if channel == self.okButton:
                 self.state = 1
         elif self.state == 1:
@@ -61,11 +59,12 @@ class OrchestratorInput:
             self.state6(channel)
         elif self.state == 7:
             if channel == self.okButton:
+                logging.debug("OrchestratorInput: select keyboard color")
                 self.orchestrator.addNewOrder(self.phone)
                 self.state = 0
 
     def state1(self, channel):
-        print("Select Frame Shape")
+        logging.debug("OrchestratorInput: select frame shape")
         if channel == self.okButton and self.selected:
             self.state = 2
             self.selected = False
@@ -80,7 +79,7 @@ class OrchestratorInput:
             self.selected = True
 
     def state2(self, channel):
-        print("Select Frame Color")
+        logging.debug("OrchestratorInput: select frame color")
         if channel == self.okButton and self.selected:
             self.state = 3
             self.selected = False
@@ -95,7 +94,7 @@ class OrchestratorInput:
             self.selected = True
 
     def state3(self, channel):
-        print("Select Screen Shape")
+        logging.debug("OrchestratorInput: select screen shape")
         if channel == self.okButton and self.selected:
             self.state = 4
             self.selected = False
@@ -110,7 +109,7 @@ class OrchestratorInput:
             self.selected = True
 
     def state4(self, channel):
-        print("Select Screen Color")
+        logging.debug("OrchestratorInput: select screen color")
         if channel == self.okButton and self.selected:
             self.state = 5
             self.selected = False
@@ -125,7 +124,7 @@ class OrchestratorInput:
             self.selected = True
 
     def state5(self, channel):
-        print("Select Keyboard Shape")
+        logging.debug("OrchestratorInput: select keyboard shape")
         if channel == self.okButton and self.selected:
             self.state = 6
             self.selected = False
@@ -140,7 +139,7 @@ class OrchestratorInput:
             self.selected = True
 
     def state6(self, channel):
-        print("Select Keyboard Color")
+        logging.debug("OrchestratorInput: select keyboard color")
         if channel == self.okButton and self.selected:
             self.state = 7
             self.selected = False

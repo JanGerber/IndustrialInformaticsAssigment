@@ -1,3 +1,5 @@
+import logging
+
 import requests
 
 from industrial_inf_assigment.workstation import Workstation
@@ -14,35 +16,56 @@ class Subscriber:
         url = hostIP + self.port + self.baseService + "/Z" + str(zone.value) + "_Changed/notifs"
         destUrl = self.ownAdress + endpoint
         r = requests.post(url, json={"destUrl": destUrl})
-        print(r.status_code)
+        if r.status_code == 200:
+            logging.debug("Subscriber: subscribe to Zone " + str(zone.value) + "successful")
+        else:
+            logging.error(
+                "Subscriber: subscribe to Zone " + str(zone.value) + ", IP: " + hostIP + " Status Code: " + str(
+                    r.status_code))
 
     def subscribeToPenChangeStart(self, hostIP, endpoint):
         url = hostIP + self.port + self.baseService + "/PenChangeStarted/notifs"
         destUrl = self.ownAdress + endpoint
         r = requests.post(url, json={"destUrl": destUrl})
-        print(r.status_code)
-        print("Subscribed to PenChangeStart")
+        if r.status_code == 200:
+            logging.debug("Subscriber: subscribe to  pen change start successful")
+        else:
+            logging.error(
+                "Subscriber: subscribe to pen change start failed, IP: " + hostIP + " Status Code: " + str(
+                    r.status_code))
 
     def subscribeToPenChangeEnd(self, hostIP, endpoint):
         url = hostIP + self.port + self.baseService + "/PenChangeEnded/notifs"
         destUrl = self.ownAdress + endpoint
         r = requests.post(url, json={"destUrl": destUrl})
-        print(r.status_code)
-        print("Subscribed to PenChangeEnd")
+        if r.status_code == 200:
+            logging.debug("Subscriber: subscribe to  pen change end successful")
+        else:
+            logging.error(
+                "Subscriber: subscribe to pen change end failed, IP: " + hostIP + " Status Code: " + str(
+                    r.status_code))
 
     def subscribeToDrawingStart(self, hostIP, endpoint):
         url = hostIP + self.port + self.baseService + "/DrawStartExecution/notifs"
         destUrl = self.ownAdress + endpoint
         r = requests.post(url, json={"destUrl": destUrl})
-        print(r.status_code)
-        print("Subscribed to Drawing Start")
+        if r.status_code == 200:
+            logging.debug("Subscriber: subscribe to drawing start successful")
+        else:
+            logging.error(
+                "Subscriber: subscribe to drawing start failed, IP: " + hostIP + " Status Code: " + str(
+                    r.status_code))
 
     def subscribeToDrawingEnd(self, hostIP, endpoint):
         url = hostIP + self.port + self.baseService + "/DrawEndExecution/notifs"
         destUrl = self.ownAdress + endpoint
         r = requests.post(url, json={"destUrl": destUrl})
-        print(r.status_code)
-        print("Subscribed to Drawing End")
+        if r.status_code == 200:
+            logging.debug("Subscriber: subscribe to drawing end successful")
+        else:
+            logging.error(
+                "Subscriber: subscribe to drawing failed IP: " + hostIP + " Status Code: " + str(
+                    r.status_code))
 
     def subscribeToAllEventsOfWS(self, ws: Workstation):
         self.subscribeToPenChangeEnd(ws.baseIp + ".1", "/rest/events/ws/" + ws.getUUID() + "/PenChangeEnd/info")

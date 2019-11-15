@@ -18,7 +18,7 @@ class Workstation:
 
     def addPallet(self, pallet):
         if len(self.pallets) >= 5:
-            print("The workstation reached the maximum amount of pallets!")
+            logging.warning("The workstation reached the maximum amount of pallets!")
             return False
         else:
             self.pallets.append(pallet)
@@ -28,7 +28,7 @@ class Workstation:
         if len(self.pallets) > 0:
             return self.pallets.pop(0)
         else:
-            print("The workstation don't contains any pallet!")
+            logging.warning("The workstation don't contains any pallet!")
             return
 
     def getUUID(self) -> str:
