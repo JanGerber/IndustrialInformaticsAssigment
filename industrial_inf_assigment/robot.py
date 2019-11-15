@@ -35,11 +35,10 @@ class Robot:
         else:
             logging.error(
                 "Robot: select pen failure, color: " + str(color.name) + ", Status Code: " + str(r.status_code))
-        # TODO implement status code evaluation
 
     def executeDrawing(self, color: PhoneColor, shape: PhoneShape):
         if color != self.getPenColor():
-            self.selectPen(color)
+            logging.warning("Robot: wrong color selected")
         url = self.hostIP + self.baseService + "/" + shape.value
         r = requests.post(url, json={"destUrl": ""})
         if r.status_code == 202:
@@ -47,11 +46,11 @@ class Robot:
         else:
             logging.error("Robot: execute drawing failure, color: " + str(color.name) + ", shape: " + str(
                 shape.name) + " Status Code: " + str(r.status_code))
-        # TODO implement status code evaluation and return
 
     def getPenColor(self) -> PhoneColor:
         logging.info("Robot: get pen color")
         url = self.hostIP + self.baseService + "/GetPenColor"
         r = requests.post(url, json={})
+        logging.debug(r.json())
 
         return PhoneColor.RED  # TODO read data from request

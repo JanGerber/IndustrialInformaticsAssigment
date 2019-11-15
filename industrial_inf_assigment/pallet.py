@@ -1,6 +1,7 @@
 import logging
 import uuid
 
+from industrial_inf_assigment.pallet_status import PalletStatus
 from industrial_inf_assigment.workstation import Workstation
 from industrial_inf_assigment.phone import Phone
 from industrial_inf_assigment.zone import Zone
@@ -16,6 +17,7 @@ class Pallet:
         self.frameDone = False
         self.screenDone = False
         self.keyboardDone = False
+        self.status = PalletStatus.WAITING
         logging.debug("Initialization: new pallet  (" + str(self.palletID) + ")")
 
     def printPalletInfo(self):
