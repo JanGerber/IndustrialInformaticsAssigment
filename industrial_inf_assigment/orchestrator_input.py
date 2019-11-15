@@ -26,7 +26,7 @@ class OrchestratorInput:
             if self.state == 0:
                 explorerhat.light[0].off()
                 time.sleep(0.1)
-            elif self.state == 7:
+            elif self.state == 5:
                 explorerhat.light[0].on()
                 time.sleep(0.2)
                 explorerhat.light[0].off()
@@ -54,10 +54,6 @@ class OrchestratorInput:
         elif self.state == 4:
             self.state4(channel)
         elif self.state == 5:
-            self.state5(channel)
-        elif self.state == 6:
-            self.state6(channel)
-        elif self.state == 7:
             if channel == self.okButton:
                 logging.debug("OrchestratorInput: select keyboard color")
                 self.orchestrator.addNewOrder(self.phone)
@@ -79,24 +75,9 @@ class OrchestratorInput:
             self.selected = True
 
     def state2(self, channel):
-        logging.debug("OrchestratorInput: select frame color")
-        if channel == self.okButton and self.selected:
-            self.state = 3
-            self.selected = False
-        elif channel == 2:
-            self.phone.frameColor = PhoneColor.RED
-            self.selected = True
-        elif channel == 3:
-            self.phone.frameColor = PhoneColor.GREEN
-            self.selected = True
-        elif channel == 4:
-            self.phone.frameColor = PhoneColor.BLUE
-            self.selected = True
-
-    def state3(self, channel):
         logging.debug("OrchestratorInput: select screen shape")
         if channel == self.okButton and self.selected:
-            self.state = 4
+            self.state = 3
             self.selected = False
         elif channel == 2:
             self.phone.screenShape = PhoneShape.SCREEN_1
@@ -108,25 +89,10 @@ class OrchestratorInput:
             self.phone.screenShape = PhoneShape.SCREEN_3
             self.selected = True
 
-    def state4(self, channel):
-        logging.debug("OrchestratorInput: select screen color")
-        if channel == self.okButton and self.selected:
-            self.state = 5
-            self.selected = False
-        elif channel == 2:
-            self.phone.screenColor = PhoneColor.RED
-            self.selected = True
-        elif channel == 3:
-            self.phone.screenColor = PhoneColor.GREEN
-            self.selected = True
-        elif channel == 4:
-            self.phone.screenColor = PhoneColor.BLUE
-            self.selected = True
-
-    def state5(self, channel):
+    def state3(self, channel):
         logging.debug("OrchestratorInput: select keyboard shape")
         if channel == self.okButton and self.selected:
-            self.state = 6
+            self.state = 4
             self.selected = False
         elif channel == 2:
             self.phone.keyboardShape = PhoneShape.KEYBOARD_1
@@ -138,19 +104,19 @@ class OrchestratorInput:
             self.phone.keyboardShape = PhoneShape.KEYBOARD_3
             self.selected = True
 
-    def state6(self, channel):
-        logging.debug("OrchestratorInput: select keyboard color")
+    def state4(self, channel):
+        logging.debug("OrchestratorInput: select phone color")
         if channel == self.okButton and self.selected:
-            self.state = 7
+            self.state = 5
             self.selected = False
         elif channel == 2:
-            self.phone.keyboardColor = PhoneColor.RED
+            self.phone.color = PhoneColor.RED
             self.selected = True
         elif channel == 3:
-            self.phone.keyboardColor = PhoneColor.GREEN
+            self.phone.color = PhoneColor.GREEN
             self.selected = True
         elif channel == 4:
-            self.phone.keyboardColor = PhoneColor.BLUE
+            self.phone.color = PhoneColor.BLUE
             self.selected = True
 
     def resetPhone(self):

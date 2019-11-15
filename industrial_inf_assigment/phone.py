@@ -1,8 +1,10 @@
+from industrial_inf_assigment.phone_color import PhoneColor
+from industrial_inf_assigment.phone_shape import PhoneShape
+
+
 class Phone:
-    def __init__(self, frameShape, frameColor, keyboardShape, keyboadColor, screenShape, screenColor):
+    def __init__(self, frameShape: PhoneShape, keyboardShape: PhoneShape, screenShape: PhoneShape, color: PhoneColor):
         self.frameShape = frameShape
-        self.frameColor = frameColor
         self.keyboardShape = keyboardShape
-        self.keyboardColor = keyboadColor
         self.screenShape = screenShape
-        self.screenColor = screenColor
+        self.color = color
