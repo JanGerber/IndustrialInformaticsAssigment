@@ -13,7 +13,8 @@ from industrial_inf_assigment.workstation import Workstation
 # Logging
 
 
-logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(asctime)s - %(message)s')
+logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(asctime)s - %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
 
 
 # Workstations
@@ -56,7 +57,6 @@ threadOrchestrationInput.start()
 def penSelectedEndEvent(wsId):
     logging.debug("Event: Pen Selected End WS(" + wsId + ")")
     content = request.json
-    logging.debug(content)
     orchestrator.penSelectedEndEvent()
     cnvMsg = {}
     cnvMsg_str = json.dumps(cnvMsg)
@@ -66,8 +66,6 @@ def penSelectedEndEvent(wsId):
 @app.route('/rest/events/ws/<string:wsId>/PenChangeStart/info', methods=['POST'])
 def penSelectedStartEvent(wsId):
     logging.debug("Event: Pen Selected Start WS(" + wsId + ")")
-    content = request.json
-    logging.debug(content)
     orchestrator.penSelectedStartEvent()
     cnvMsg = {}
     cnvMsg_str = json.dumps(cnvMsg)
@@ -77,8 +75,6 @@ def penSelectedStartEvent(wsId):
 @app.route('/rest/events/ws/<string:wsId>/DrawStartExecution/info', methods=['POST'])
 def drawingStartEvent(wsId):
     logging.debug("Event: Drawing Start WS(" + wsId + ")")
-    content = request.json
-    logging.debug(content)
     orchestrator.drawingStartEvent()
     cnvMsg = {}
     cnvMsg_str = json.dumps(cnvMsg)
@@ -120,7 +116,6 @@ def zone2ChangedEvent(wsId):
 def zone3ChangedEvent(wsId):
     logging.debug("Event: Zone 3 Changed WS(" + wsId + ")")
     content = request.json
-    logging.debug(content)
     payload = content["payload"]
     orchestrator.zone3ChangedEvent(payload["PalletID"])
     cnvMsg = {}
@@ -133,7 +128,6 @@ def zone4ChangedEvent(wsId):
     logging.debug("Event: Zone 4 Changed WS(" + wsId + ")")
     content = request.json
     payload = content["payload"]
-    logging.debug(content)
     orchestrator.zone4ChangedEvent(payload["PalletID"])
     cnvMsg = {}
     cnvMsg_str = json.dumps(cnvMsg)

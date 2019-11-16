@@ -6,6 +6,7 @@ from industrial_inf_assigment.orchestrator_status import OrchestratorStatus
 from industrial_inf_assigment.pallet import Pallet
 from industrial_inf_assigment.pallet_status import PalletStatus
 from industrial_inf_assigment.phone import Phone
+from industrial_inf_assigment.status_code import StatusCode
 from industrial_inf_assigment.workstation import Workstation
 from industrial_inf_assigment.zone import Zone
 
@@ -16,7 +17,6 @@ class Orchestrator:
         self.orchestratorID = uuid.uuid4()
         self.ws = workstation
         self.bufferOrder = []
-        self.pallets = []
         self.status = orchestratorStatus
         logging.debug("Initialization: new orchestrator  (" + str(self.orchestratorID) + ")")
 
@@ -26,7 +26,8 @@ class Orchestrator:
             self.testNextStepInZone2()
             self.testNextStepInZone3()
             self.testNextStepInZone4()
-            # self.testNextStepInZone5()
+            self.printPalletInfos()
+            self.testForWorking()
             time.sleep(5)
 
     def addNewOrder(self, phone: Phone):
@@ -55,8 +56,8 @@ class Orchestrator:
         pass
 
     def testIfAnyPalletIsInZone(self, zone: Zone) -> bool:
-        if len(self.pallets) > 0:
-            for pallet in self.pallets:
+        if len(self.ws.pallets) > 0:
+            for pallet in self.ws.pallets:
                 if pallet.locationZone == zone:
                     return True
         return False
@@ -69,7 +70,7 @@ class Orchestrator:
     def addPalletToWS(self, pallet):
         if len(self.ws.pallets) >= 5:
             logging.warning("Orchestrator: there are already 5 pallets in the ws")
-        self.pallets.append(pallet)
+        self.ws.pallets.append(pallet)
 
     def drawingEndEvent(self):
         pallet = self.getPalletOnByStatus(PalletStatus.DRAWING)
@@ -103,7 +104,7 @@ class Orchestrator:
             pallet = self.getPalletOnByStatus(PalletStatus.WAIT_FOR_REMOVAL)
             if pallet is None:
                 return
-            self.pallets.remove(pallet)
+            self.ws.pallets.remove(pallet)
             return
         pallet = self.getPalletOnByStatus(PalletStatus.MOVING_TO_Z5)
         if pallet is None:
@@ -112,19 +113,19 @@ class Orchestrator:
         pallet.status = PalletStatus.WAIT_FOR_REMOVAL
 
     def testIfAnyPalletStatusIs(self, status: PalletStatus) -> bool:
-        for pallet in self.pallets:
+        for pallet in self.ws.pallets:
             if pallet.status == status:
                 return True
         return False
 
     def getPalletOnZone(self, zone: Zone) -> Pallet:
-        for pallet in self.pallets:
+        for pallet in self.ws.pallets:
             if pallet.locationZone == zone:
                 return pallet
         logging.error("Orchestrator: couldn't find pallet on zone: " + str(zone.name))
 
     def getPalletOnByStatus(self, status: PalletStatus):
-        for pallet in self.pallets:
+        for pallet in self.ws.pallets:
             if pallet.status == status:
                 return pallet
         logging.error("Orchestrator: couldn't find pallet with that status: " + str(status.name))
@@ -217,5 +218,22 @@ class Orchestrator:
         pallet.status = PalletStatus.WAITING
 
     def zone1ChangedEvent(self, palletId: int):
-        # TODO add order to pallet
-        pass
+        if palletId == -1:
+            return
+        if self.testIfAnyPalletIsInZone(Zone.Z1):
+            return
+        if len(self.bufferOrder) >= 1:
+            self.addPhoneToPallet(self.bufferOrder.pop())
+
+    def printPalletInfos(self):
+        p: Pallet = None
+        for p in self.ws.pallets:
+            p.printPalletInfo()
+
+    def testForWorking(self):
+        p: Pallet = None
+        for p in self.ws.pallets:
+            if p.status is PalletStatus.WAIT_PEN_CHANGE or p.status is PalletStatus.MOVING_TO_Z2 or p.status is PalletStatus.MOVING_TO_Z3 or p.status is PalletStatus.MOVING_TO_Z4 or p.status is PalletStatus.MOVING_TO_Z5 or p.status is PalletStatus.DRAWING:
+                self.status.changeColor(StatusCode.WORKING)
+                return
+        self.status.changeColor(StatusCode.IDLE)

@@ -21,4 +21,6 @@ class Pallet:
         logging.debug("Initialization: new pallet  (" + str(self.palletID) + ")")
 
     def printPalletInfo(self):
-        logging.info("Pallet: \tpalletID:" + str(self.palletID))
+        logging.info(
+            "Pallet: \tpalletID:" + str(self.palletID) + " Zone: " + str(self.locationZone) + " Status: " + str(
+                self.status.name))
