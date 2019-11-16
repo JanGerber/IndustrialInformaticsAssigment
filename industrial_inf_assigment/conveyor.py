@@ -1,4 +1,3 @@
-import json
 import logging
 import uuid
 
@@ -28,10 +27,14 @@ class Conveyor:
                     r.status_code))
 
     def getZoneStatus(self, zone: Zone):
-        url = self.hostIP + self.baseService + "/Zone" + str(zone.value)
-        r = requests.post(url, json={"destUrl": ""})
+        url = self.hostIP + self.baseService + "/Z" + str(zone.value)
+        r = None
+        if zone == Zone.Z1:
+            r = requests.get(url, json={"destUrl": ""})
+        else:
+            r = requests.post(url, json={"destUrl": ""})
 
-        reqMsg = json.loads(r.text)
+        reqMsg = r.json()
         palletID = reqMsg["PalletID"]
 
         return palletID

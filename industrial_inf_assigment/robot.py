@@ -36,7 +36,7 @@ class Robot:
             logging.error(
                 "Robot: select pen failure, color: " + str(color.name) + ", Status Code: " + str(r.status_code))
 
-    def executeDrawing(self, color: PhoneColor, shape: PhoneShape):
+    def executeDrawing(self, shape: PhoneShape, color: PhoneColor):
         if color != self.getPenColor():
             logging.warning("Robot: wrong color selected")
         url = self.hostIP + self.baseService + "/" + shape.value

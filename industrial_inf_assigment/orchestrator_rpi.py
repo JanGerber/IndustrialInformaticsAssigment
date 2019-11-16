@@ -6,7 +6,6 @@ from industrial_inf_assigment.orchestrator_status import OrchestratorStatus
 from industrial_inf_assigment.pallet import Pallet
 from industrial_inf_assigment.pallet_status import PalletStatus
 from industrial_inf_assigment.phone import Phone
-from industrial_inf_assigment.phone_color import PhoneColor
 from industrial_inf_assigment.workstation import Workstation
 from industrial_inf_assigment.zone import Zone
 
@@ -23,20 +22,23 @@ class Orchestrator:
 
     def runOrchestation(self):
         while True:
-            time.sleep(1)
             self.testNextStepInZone1()
             self.testNextStepInZone2()
             self.testNextStepInZone3()
             self.testNextStepInZone4()
             # self.testNextStepInZone5()
+            time.sleep(5)
 
     def addNewOrder(self, phone: Phone):
         logging.info("Orchestrator: new phone added to order list")
         if self.ws.conveyor.getZoneStatus(Zone.Z1) == -1:
+            logging.debug("Orchestrator: add to buffer 1")
             self.addOrderToBuffer(phone)
         elif self.testIfAnyPalletIsInZone(Zone.Z1):
+            logging.debug("Orchestrator: add to buffer 1")
             self.addOrderToBuffer(phone)
         else:
+            logging.debug("Orchestrator: add to pallet")
             self.addPhoneToPallet(phone)
 
     def addOrderToBuffer(self, phone: Phone):
@@ -53,9 +55,10 @@ class Orchestrator:
         pass
 
     def testIfAnyPalletIsInZone(self, zone: Zone) -> bool:
-        for pallet in self.pallets:
-            if pallet.locationZone == zone:
-                return True
+        if len(self.pallets) > 0:
+            for pallet in self.pallets:
+                if pallet.locationZone == zone:
+                    return True
         return False
 
     def addPhoneToPallet(self, phone: Phone):
@@ -66,7 +69,7 @@ class Orchestrator:
     def addPalletToWS(self, pallet):
         if len(self.ws.pallets) >= 5:
             logging.warning("Orchestrator: there are already 5 pallets in the ws")
-        self.ws.pallets.append(pallet)
+        self.pallets.append(pallet)
 
     def drawingEndEvent(self):
         pallet = self.getPalletOnByStatus(PalletStatus.DRAWING)
@@ -77,18 +80,34 @@ class Orchestrator:
 
         pallet.status = PalletStatus.WAIT_FOR_MOVING
 
-    def zone3ChangedEvent(self):
+    def zone3ChangedEvent(self, palletId: int):
+        if palletId == -1:
+            return
         pallet = self.getPalletOnByStatus(PalletStatus.MOVING_TO_Z3)
+        if pallet is None:
+            return
         pallet.locationZone = Zone.Z3
         pallet.status = PalletStatus.WAITING
 
-    def zone4ChangedEvent(self):
+    def zone4ChangedEvent(self, palletId: int):
+        if palletId == -1:
+            return
         pallet = self.getPalletOnByStatus(PalletStatus.MOVING_TO_Z4)
+        if pallet is None:
+            return
         pallet.locationZone = Zone.Z4
         pallet.status = PalletStatus.WAITING
 
-    def zone5ChangedEvent(self):
+    def zone5ChangedEvent(self, palletId: int):
+        if palletId == -1:
+            pallet = self.getPalletOnByStatus(PalletStatus.WAIT_FOR_REMOVAL)
+            if pallet is None:
+                return
+            self.pallets.remove(pallet)
+            return
         pallet = self.getPalletOnByStatus(PalletStatus.MOVING_TO_Z5)
+        if pallet is None:
+            return
         pallet.locationZone = Zone.Z5
         pallet.status = PalletStatus.WAIT_FOR_REMOVAL
 
@@ -114,40 +133,42 @@ class Orchestrator:
         pass
 
     def testNextStepInZone1(self):
-        if self.testIfAnyPalletIsInZone(Zone.Z1):
+        if not self.testIfAnyPalletIsInZone(Zone.Z1):
             return
         pallet = self.getPalletOnZone(Zone.Z1)
         if pallet.status == PalletStatus.MOVING_TO_Z2:
             return
         if not self.testIfAnyPalletIsInZone(Zone.Z2) or not self.testIfAnyPalletStatusIs(PalletStatus.MOVING_TO_Z2):
+            logging.info("Orchestrator: move pallet from zone 1 to zone 2")
             pallet.status = PalletStatus.MOVING_TO_Z2
             self.ws.conveyor.movePallet(Zone.Z1, Zone.Z2)
             return
         if len(self.bufferOrder) == 0:
             return
         if not self.testIfAnyPalletIsInZone(Zone.Z4) or not self.testIfAnyPalletStatusIs(PalletStatus.MOVING_TO_Z4):
+            logging.info("Orchestrator: move pallet from zone 1 to zone 4")
             pallet.status = PalletStatus.MOVING_TO_Z4
             self.ws.conveyor.movePallet(Zone.Z1, Zone.Z4)
-            return
 
     def testNextStepInZone2(self):
-        if self.testIfAnyPalletIsInZone(Zone.Z2):
+        if not self.testIfAnyPalletIsInZone(Zone.Z2):
             return
         pallet = self.getPalletOnZone(Zone.Z2)
         if pallet.status == PalletStatus.MOVING_TO_Z3 or pallet.status == PalletStatus.WAIT_PEN_CHANGE:
             return
         if pallet.status == PalletStatus.WAITING and not self.testIfAnyPalletIsInZone(Zone.Z3):
-            color: PhoneColor = self.ws.robot.getPenColor()
+            color = self.ws.robot.getPenColor()
             if color != pallet.phone.color:
+                logging.info("Orchestrator: change pen")
                 pallet.status = PalletStatus.WAIT_PEN_CHANGE
                 self.ws.robot.selectPen(pallet.phone.color)
         if pallet.status == PalletStatus.WAIT_FOR_MOVING and not self.testIfAnyPalletIsInZone(Zone.Z3):
+            logging.info("Orchestrator: move pallet from zone 2 to zone 3")
             pallet.status = PalletStatus.MOVING_TO_Z3
             self.ws.conveyor.movePallet(Zone.Z2, Zone.Z3)
-            return
 
     def testNextStepInZone3(self):
-        if self.testIfAnyPalletIsInZone(Zone.Z3):
+        if not self.testIfAnyPalletIsInZone(Zone.Z3):
             return
         pallet = self.getPalletOnZone(Zone.Z3)
         if pallet.status == PalletStatus.MOVING_TO_Z4 or pallet.status == PalletStatus.DRAWING:
@@ -168,13 +189,12 @@ class Orchestrator:
             return
         if pallet.status == PalletStatus.WAIT_FOR_MOVING and not self.testIfAnyPalletIsInZone(
                 Zone.Z5) and not self.testIfAnyPalletStatusIs(PalletStatus.MOVING_TO_Z5):
+            logging.info("Orchestrator: move pallet from zone 3 to zone 5")
             pallet.status = PalletStatus.MOVING_TO_Z5
             self.ws.conveyor.movePallet(Zone.Z3, Zone.Z5)
-            return
-        return
 
     def testNextStepInZone4(self):
-        if self.testIfAnyPalletIsInZone(Zone.Z4):
+        if not self.testIfAnyPalletIsInZone(Zone.Z4):
             return
         pallet = self.getPalletOnZone(Zone.Z4)
         if pallet.status == PalletStatus.MOVING_TO_Z4:
@@ -184,13 +204,18 @@ class Orchestrator:
             self.ws.conveyor.movePallet(Zone.Z4, Zone.Z5)
 
     def testNextStepInZone5(self):
-        if self.testIfAnyPalletIsInZone(Zone.Z5):
+        if not self.testIfAnyPalletIsInZone(Zone.Z5):
             return
 
-    def zone2ChangedEvent(self):
+    def zone2ChangedEvent(self, palletId: int):
+        if palletId == -1:
+            return
         pallet = self.getPalletOnByStatus(PalletStatus.MOVING_TO_Z2)
+        if pallet is None:
+            return
         pallet.locationZone = Zone.Z2
         pallet.status = PalletStatus.WAITING
 
-    def zone1ChangedEvent(self):
+    def zone1ChangedEvent(self, palletId: int):
+        # TODO add order to pallet
         pass

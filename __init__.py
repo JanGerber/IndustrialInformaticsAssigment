@@ -13,7 +13,7 @@ from industrial_inf_assigment.workstation import Workstation
 # Logging
 
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(message)s')
+logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(asctime)s - %(message)s')
 
 
 # Workstations
@@ -23,7 +23,7 @@ w2 = Workstation(w2BaseUrl, None)
 # Subscribers
 raspberryPiAddress = "http://192.168.0.108:5000"
 sub = Subscriber(raspberryPiAddress)
-# sub.subscribeToAllEventsOfWS(w2)
+sub.subscribeToAllEventsOfWS(w2)
 
 # Orchestration
 orchestratorStatus = OrchestratorStatus()
@@ -98,8 +98,8 @@ def drawingEndEvent(wsId):
 def zone1ChangedEvent(wsId):
     logging.debug("Event: Zone 1 Changed WS(" + wsId + ")")
     content = request.json
-    logging.debug(content)
-    orchestrator.zone1ChangedEvent()
+    payload = content["payload"]
+    orchestrator.zone1ChangedEvent(payload["PalletID"])
     cnvMsg = {}
     cnvMsg_str = json.dumps(cnvMsg)
     return cnvMsg_str
@@ -109,8 +109,8 @@ def zone1ChangedEvent(wsId):
 def zone2ChangedEvent(wsId):
     logging.debug("Event: Zone 2 Changed WS(" + wsId + ")")
     content = request.json
-    logging.debug(content)
-    orchestrator.zone2ChangedEvent()
+    payload = content["payload"]
+    orchestrator.zone2ChangedEvent(payload["PalletID"])
     cnvMsg = {}
     cnvMsg_str = json.dumps(cnvMsg)
     return cnvMsg_str
@@ -121,7 +121,8 @@ def zone3ChangedEvent(wsId):
     logging.debug("Event: Zone 3 Changed WS(" + wsId + ")")
     content = request.json
     logging.debug(content)
-    orchestrator.zone3ChangedEvent()
+    payload = content["payload"]
+    orchestrator.zone3ChangedEvent(payload["PalletID"])
     cnvMsg = {}
     cnvMsg_str = json.dumps(cnvMsg)
     return cnvMsg_str
@@ -131,8 +132,9 @@ def zone3ChangedEvent(wsId):
 def zone4ChangedEvent(wsId):
     logging.debug("Event: Zone 4 Changed WS(" + wsId + ")")
     content = request.json
+    payload = content["payload"]
     logging.debug(content)
-    orchestrator.zone4ChangedEvent()
+    orchestrator.zone4ChangedEvent(payload["PalletID"])
     cnvMsg = {}
     cnvMsg_str = json.dumps(cnvMsg)
     return cnvMsg_str
@@ -142,8 +144,8 @@ def zone4ChangedEvent(wsId):
 def zone5ChangedEvent(wsId):
     logging.debug("Event: Zone 5 Changed WS(" + wsId + ")")
     content = request.json
-    logging.debug(content)
-    orchestrator.zone5ChangedEvent()
+    payload = content["payload"]
+    orchestrator.zone5ChangedEvent(payload["PalletID"])
     cnvMsg = {}
     cnvMsg_str = json.dumps(cnvMsg)
     return cnvMsg_str

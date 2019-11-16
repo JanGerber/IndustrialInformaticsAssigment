@@ -68,17 +68,19 @@ class Subscriber:
                     r.status_code))
 
     def subscribeToAllEventsOfWS(self, ws: Workstation):
-        self.subscribeToPenChangeEnd(ws.baseIp + ".1", "/rest/events/ws/" + ws.getUUID() + "/PenChangeEnd/info")
-        self.subscribeToPenChangeStart(ws.baseIp + ".1", "/rest/events/ws/" + ws.getUUID() + "/PenChangeStart/info")
-        self.subscribeToDrawingStart(ws.baseIp + ".1", "/rest/events/ws/" + ws.getUUID() + "/DrawStartExecution/info")
-        self.subscribeToDrawingEnd(ws.baseIp + ".1", "/rest/events/ws/" + ws.getUUID() + "/DrawEndExecution/info")
-        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z1.value,
-                                   "/rest/events/ws/" + ws.getUUID() + "/Z" + Zone.Z1.value + "_Changed/info")
-        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z2.value,
-                                   "/rest/events/ws/" + ws.getUUID() + "/Z" + Zone.Z2.value + "_Changed/info")
-        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z3.value,
-                                   "/rest/events/ws/" + ws.getUUID() + "/Z" + Zone.Z3.value + "_Changed/info")
-        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z4.value,
-                                   "/rest/events/ws/" + ws.getUUID() + "/Z" + Zone.Z4.value + "_Changed/info")
-        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z5.value,
-                                   "/rest/events/ws/" + ws.getUUID() + "/Z" + Zone.Z5.value + "_Changed/info")
+        self.subscribeToPenChangeEnd(ws.baseIp + ".1", "/rest/events/ws/" + str(ws.getUUID()) + "/PenChangeEnd/info")
+        self.subscribeToPenChangeStart(ws.baseIp + ".1",
+                                       "/rest/events/ws/" + str(ws.getUUID()) + "/PenChangeStart/info")
+        self.subscribeToDrawingStart(ws.baseIp + ".1",
+                                     "/rest/events/ws/" + str(ws.getUUID()) + "/DrawStartExecution/info")
+        self.subscribeToDrawingEnd(ws.baseIp + ".1", "/rest/events/ws/" + str(ws.getUUID()) + "/DrawEndExecution/info")
+        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z1,
+                                   "/rest/events/ws/" + str(ws.getUUID()) + "/Z1_Changed/info")
+        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z2,
+                                   "/rest/events/ws/" + str(ws.getUUID()) + "/Z2_Changed/info")
+        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z3,
+                                   "/rest/events/ws/" + str(ws.getUUID()) + "/Z3_Changed/info")
+        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z4,
+                                   "/rest/events/ws/" + str(ws.getUUID()) + "/Z4_Changed/info")
+        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z5,
+                                   "/rest/events/ws/" + str(ws.getUUID()) + "/Z5_Changed/info")

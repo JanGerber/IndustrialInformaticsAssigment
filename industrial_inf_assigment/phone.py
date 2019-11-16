@@ -1,3 +1,5 @@
+import logging
+
 from industrial_inf_assigment.phone_color import PhoneColor
 from industrial_inf_assigment.phone_shape import PhoneShape
 
@@ -8,3 +10,7 @@ class Phone:
         self.keyboardShape = keyboardShape
         self.screenShape = screenShape
         self.color = color
+
+    def printPhone(self):
+        logging.debug("Phone: Frame: " + str(self.frameShape.value) + " Keyboard: " + str(
+            self.keyboardShape.value) + " Screen: " + str(self.screenShape.value) + " Color:" + str(self.color.name))

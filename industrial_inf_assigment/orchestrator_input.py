@@ -12,7 +12,7 @@ from industrial_inf_assigment.phone_shape import PhoneShape
 class OrchestratorInput:
 
     def __init__(self, orchestrator: Orchestrator):
-        self.phone = Phone(PhoneShape.FRAME_1, PhoneColor.RED, PhoneShape.KEYBOARD_1, PhoneColor.RED,
+        self.phone = Phone(PhoneShape.FRAME_1, PhoneShape.KEYBOARD_1,
                            PhoneShape.SCREEN_1, PhoneColor.RED)
         self.state = 0
         self.selected = False
@@ -55,7 +55,8 @@ class OrchestratorInput:
             self.state4(channel)
         elif self.state == 5:
             if channel == self.okButton:
-                logging.debug("OrchestratorInput: select keyboard color")
+                logging.debug("OrchestratorInput: Phone")
+                self.phone.printPhone()
                 self.orchestrator.addNewOrder(self.phone)
                 self.state = 0
 
