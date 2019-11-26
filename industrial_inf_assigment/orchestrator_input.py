@@ -5,8 +5,8 @@ import explorerhat
 
 from industrial_inf_assigment.orchestrator_rpi import Orchestrator
 from industrial_inf_assigment.phone import Phone
-from industrial_inf_assigment.phone_color import PhoneColor
-from industrial_inf_assigment.phone_shape import PhoneShape
+from industrial_inf_assigment.enum.phone_color import PhoneColor
+from industrial_inf_assigment.enum.phone_shape import PhoneShape
 
 
 class OrchestratorInput:

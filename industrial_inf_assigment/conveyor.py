@@ -3,7 +3,7 @@ import uuid
 
 import requests
 
-from industrial_inf_assigment.zone import Zone
+from industrial_inf_assigment.enum.zone import Zone
 
 
 class Conveyor:
