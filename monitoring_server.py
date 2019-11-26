@@ -20,11 +20,13 @@ ws = Workstation(w2BaseUrl, None)
 
 # Subscriber
 locPort = 5000
-serverAddress = "http://192.168.0.108:" + str(locPort)
+serverAddress = "http://192.168.102.201:" + str(locPort)
 subscriber = Subscriber(serverAddress)
+# subscriber.subscribeToAllEventsOfWsSimple(ws)
 
 # DB
 eventDAO = MonitoringEventDAO(False)
+
 
 app = Flask(__name__)
 
@@ -33,33 +35,25 @@ app = Flask(__name__)
 def static_page(page_name):
     return render_template('%s.html' % page_name)
 
-
-# @app.route('/webmonitor')
-# def webMonitorPage():
-#     return render_template("webmonitor.html")
-
-
 # Events API
 
 # Add event
-@app.route('/events', methods=['POST'])
-def index():
+@app.route('/rest/ws/<string:wsId>/event', methods=['POST'])
+def index(wsId):
     eventDesc = request.json
-    print('Raw body: ', eventDesc)
-    print('Event detected: ', eventDesc['eventID'])
-    print('Status: ', eventDesc['State'])
 
     serverTime = datetime.datetime.now()
-    eventDic = {"eventID": eventDesc['eventID'], "state": eventDesc['State'], "serverTime": serverTime}
+    eventDic = {"eventID": eventDesc['id'], "ws": wsId, "senderID": eventDesc['senderID'],
+                "payload": eventDesc['payload'], "serverTime": serverTime}
     eventDAO.insert_event(eventDic)
 
     resp = json.dumps({'thank': 'yes'}), 200, {'ContentType': 'application/json'}
     return resp
 
 
-@app.route('/events', methods=['GET'])
+@app.route('/rest/events', methods=['GET'])
 def getEvents():
-    logging.debug("Retrieving all the events...")
+    # logging.debug("Retrieving all the events...")
     allEvents = eventDAO.get_all_events()
     allEventsJson = json.dumps(allEvents)
     return allEventsJson
@@ -87,7 +81,8 @@ def getState():
 
 
 def detect_time_elapsed_alarms():
-    logging.debug("Checking for time elapsed alarms...")
+    pass
+    # logging.debug("Checking for time elapsed alarms...")
     # sqlSt="SELECT * FROM event WHERE 1"
     # c.execute(sqlSt)
     # allRobots=c.fetchall()
@@ -96,24 +91,12 @@ def detect_time_elapsed_alarms():
 
 # Find alarms
 def checkTimeElapsedAlarms():
-    logging.debug("Checking DB for alarms")
+    #logging.debug("Checking DB for alarms")
     detect_time_elapsed_alarms()
     threading.Timer(5.0, checkTimeElapsedAlarms).start()
 
 
-def createSampleDBData():
-    # creating sample data
-    serverTime = datetime.datetime.now()
-    eventDicSample = {"eventID": "inx_changed", "state": "True", "serverTime": serverTime}
-    eventDAO.insert_event(eventDicSample)
-
-    eventDicSample = {"eventID": "inx_changed", "state": "False", "serverTime": serverTime}
-    eventDAO.insert_event(eventDicSample)
-
-
 if __name__ == '__main__':
     checkTimeElapsedAlarms()
-    createSampleDBData()
-    # subscriber.subscribeToAllEventsOfWsSimple()
 
-    app.run("0.0.0.0", 5000)
+    app.run("0.0.0.0", locPort)

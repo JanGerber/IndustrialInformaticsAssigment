@@ -22,6 +22,7 @@ class Orchestrator:
 
     def runOrchestation(self):
         while True:
+
             self.testNextStepInZone1()
             self.testNextStepInZone2()
             self.testNextStepInZone3()
@@ -139,14 +140,14 @@ class Orchestrator:
         pallet = self.getPalletOnZone(Zone.Z1)
         if pallet.status == PalletStatus.MOVING_TO_Z2:
             return
-        if not self.testIfAnyPalletIsInZone(Zone.Z2) or not self.testIfAnyPalletStatusIs(PalletStatus.MOVING_TO_Z2):
+        if not self.testIfAnyPalletIsInZone(Zone.Z2) and not self.testIfAnyPalletStatusIs(PalletStatus.MOVING_TO_Z2):
             logging.info("Orchestrator: move pallet from zone 1 to zone 2")
             pallet.status = PalletStatus.MOVING_TO_Z2
             self.ws.conveyor.movePallet(Zone.Z1, Zone.Z2)
             return
         if len(self.bufferOrder) == 0:
             return
-        if not self.testIfAnyPalletIsInZone(Zone.Z4) or not self.testIfAnyPalletStatusIs(PalletStatus.MOVING_TO_Z4):
+        if not self.testIfAnyPalletIsInZone(Zone.Z4) and not self.testIfAnyPalletStatusIs(PalletStatus.MOVING_TO_Z4):
             logging.info("Orchestrator: move pallet from zone 1 to zone 4")
             pallet.status = PalletStatus.MOVING_TO_Z4
             self.ws.conveyor.movePallet(Zone.Z1, Zone.Z4)

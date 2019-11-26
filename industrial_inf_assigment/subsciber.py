@@ -87,12 +87,12 @@ class Subscriber:
 
     def subscribeToAllEventsOfWsSimple(self, ws: Workstation):
         endpointName = "/event"
-        self.subscribeToPenChangeEnd(ws.baseIp + ".1", "/" + str(ws.getUUID()) + endpointName)
-        self.subscribeToPenChangeStart(ws.baseIp + ".1", "/" + str(ws.getUUID()) + endpointName)
-        self.subscribeToDrawingStart(ws.baseIp + ".1", "/" + str(ws.getUUID()) + endpointName)
-        self.subscribeToDrawingEnd(ws.baseIp + ".1", "/" + str(ws.getUUID()) + endpointName)
-        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z1, "/" + str(ws.getUUID()) + endpointName)
-        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z2, "/" + str(ws.getUUID()) + endpointName)
-        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z3, "/" + str(ws.getUUID()) + endpointName)
-        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z4, "/" + str(ws.getUUID()) + endpointName)
-        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z5, "/" + str(ws.getUUID()) + endpointName)
+        self.subscribeToPenChangeEnd(ws.baseIp + ".1", "/rest/ws/" + str(ws.getUUID()) + endpointName)
+        self.subscribeToPenChangeStart(ws.baseIp + ".1", "/rest/ws/" + str(ws.getUUID()) + endpointName)
+        self.subscribeToDrawingStart(ws.baseIp + ".1", "/rest/ws/" + str(ws.getUUID()) + endpointName)
+        self.subscribeToDrawingEnd(ws.baseIp + ".1", "/rest/ws/" + str(ws.getUUID()) + endpointName)
+        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z1, "/rest/ws/" + str(ws.getUUID()) + endpointName)
+        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z2, "/rest/ws/" + str(ws.getUUID()) + endpointName)
+        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z3, "/rest/ws/" + str(ws.getUUID()) + endpointName)
+        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z4, "/rest/ws/" + str(ws.getUUID()) + endpointName)
+        self.subscribeToZoneChange(ws.baseIp + ".2", Zone.Z5, "/rest/ws/" + str(ws.getUUID()) + endpointName)

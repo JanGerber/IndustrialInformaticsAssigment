@@ -1,3 +1,4 @@
+import logging
 import sqlite3
 
 
@@ -13,23 +14,25 @@ class MonitoringEventDAO:
         self.c.execute("""CREATE TABLE IF NOT EXISTS event (
                      id INTEGER PRIMARY KEY,
                      eventID text,
-                     state text,
+                     ws text,
+                     senderID text,
+                     payload text,
                      serverTime timestamp
                      )""")
 
     # DB operations
     def insert_event(self, event):
-        print("Inserting event:")
-        print(event)
+        logging.debug("Inserting event:")
+        logging.debug(event)
         with self.conn:
-            self.c.execute("INSERT INTO event VALUES (NULL,:eventID, :state, :serverTime)",
-                           {'eventID': event["eventID"], 'state': event["state"], 'serverTime': event["serverTime"]})
-        self.display_all_events()
+            self.c.execute("INSERT INTO event VALUES (NULL,:eventID, :ws, :senderID :payload, :serverTime)",
+                           {'eventID': event["eventID"], 'ws': event["ws"], 'senderID': event['senderID'],
+                            'payload': event["payload"], 'serverTime': event["serverTime"]})
 
     def display_all_events(self):
-        print("Displaying all events in the DB...")
+        logging.debug("Displaying all events in the DB...")
         allEvents = self.get_all_events()
-        print(allEvents)
+        logging.debug(allEvents)
 
     def get_all_events(self):
         self.c.execute("SELECT * FROM event WHERE 1")
