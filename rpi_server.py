@@ -11,14 +11,12 @@ from industrial_inf_assigment.subsciber import Subscriber
 from industrial_inf_assigment.workstation import Workstation
 
 # Logging
-
-
 logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(asctime)s - %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
 
 
 # Workstations
-w2BaseUrl = "http://192.168.2"
+w2BaseUrl = "http://192.168.9"
 w2 = Workstation(w2BaseUrl, None)
 
 # Subscribers

@@ -1,0 +1,119 @@
+import datetime
+import json
+import logging
+import threading
+
+from flask import Flask, render_template
+from flask import request
+
+from industrial_inf_assigment.monitoring_data import MonitoringEventDAO
+from industrial_inf_assigment.subsciber import Subscriber
+from industrial_inf_assigment.workstation import Workstation
+
+# Logging
+logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(asctime)s - %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
+
+# Workstation
+w2BaseUrl = "http://192.168.9"
+ws = Workstation(w2BaseUrl, None)
+
+# Subscriber
+locPort = 5000
+serverAddress = "http://192.168.0.108:" + str(locPort)
+subscriber = Subscriber(serverAddress)
+
+# DB
+eventDAO = MonitoringEventDAO(False)
+
+app = Flask(__name__)
+
+
+@app.route('/<string:page_name>/')
+def static_page(page_name):
+    return render_template('%s.html' % page_name)
+
+
+# @app.route('/webmonitor')
+# def webMonitorPage():
+#     return render_template("webmonitor.html")
+
+
+# Events API
+
+# Add event
+@app.route('/events', methods=['POST'])
+def index():
+    eventDesc = request.json
+    print('Raw body: ', eventDesc)
+    print('Event detected: ', eventDesc['eventID'])
+    print('Status: ', eventDesc['State'])
+
+    serverTime = datetime.datetime.now()
+    eventDic = {"eventID": eventDesc['eventID'], "state": eventDesc['State'], "serverTime": serverTime}
+    eventDAO.insert_event(eventDic)
+
+    resp = json.dumps({'thank': 'yes'}), 200, {'ContentType': 'application/json'}
+    return resp
+
+
+@app.route('/events', methods=['GET'])
+def getEvents():
+    logging.debug("Retrieving all the events...")
+    allEvents = eventDAO.get_all_events()
+    allEventsJson = json.dumps(allEvents)
+    return allEventsJson
+
+
+@app.route('/conveyor/state', methods=['GET'])
+def getState():
+    logging.debug("Retrieving the conveyor state...")
+    now = datetime.datetime.now()
+    time = now.isoformat()
+    cnvMsg = {'conveyorID': 5, 'state': "working", "serverTime": time}
+    cnvMsg_str = json.dumps(cnvMsg)
+    return cnvMsg_str
+
+    logging.debug("Saving the conveyor state...")
+    content = request.json
+    logging.debug(content)
+    newState = content["state"]
+    logging.debug(newState)
+    now = datetime.datetime.now()
+    time = now.isoformat()
+    cnvMsg = {'conveyorID': 5, 'state': newState, "serverTime": time}
+    cnvMsg_str = json.dumps(cnvMsg)
+    return cnvMsg_str
+
+
+def detect_time_elapsed_alarms():
+    logging.debug("Checking for time elapsed alarms...")
+    # sqlSt="SELECT * FROM event WHERE 1"
+    # c.execute(sqlSt)
+    # allRobots=c.fetchall()
+    # logging.info(allRobots)
+
+
+# Find alarms
+def checkTimeElapsedAlarms():
+    logging.debug("Checking DB for alarms")
+    detect_time_elapsed_alarms()
+    threading.Timer(5.0, checkTimeElapsedAlarms).start()
+
+
+def createSampleDBData():
+    # creating sample data
+    serverTime = datetime.datetime.now()
+    eventDicSample = {"eventID": "inx_changed", "state": "True", "serverTime": serverTime}
+    eventDAO.insert_event(eventDicSample)
+
+    eventDicSample = {"eventID": "inx_changed", "state": "False", "serverTime": serverTime}
+    eventDAO.insert_event(eventDicSample)
+
+
+if __name__ == '__main__':
+    checkTimeElapsedAlarms()
+    createSampleDBData()
+    # subscriber.subscribeToAllEventsOfWsSimple()
+
+    app.run("0.0.0.0", 5000)

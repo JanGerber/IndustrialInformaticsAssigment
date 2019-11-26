@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web UI monitoring </title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+</head>
+<body>
+
+<h1>Web UI monitoring tool/client</h1>
+<p>Gets data from the monitoring server</p>
+
+<h3>Request Get State - REST endpoint</h3>
+
+<div id="log"> Log ELEMENT</div>
+
+<script>
+
+    function getAllEvents() {
+        console.log("get state routine...");
+
+        $.get("/events", function (data) {
+            $("#log").html(data);
+            console.log(data);
+            //alert( "Load was performed." );
+
+        });
+    }
+
+
+    window.setInterval(function () {
+        getAllEvents();
+    }, 1000);
+
+
+</script>
+
+</body>
+</html>

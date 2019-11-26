@@ -226,12 +226,10 @@ class Orchestrator:
             self.addPhoneToPallet(self.bufferOrder.pop())
 
     def printPalletInfos(self):
-        p: Pallet = None
         for p in self.ws.pallets:
             p.printPalletInfo()
 
     def testForWorking(self):
-        p: Pallet = None
         for p in self.ws.pallets:
             if p.status is PalletStatus.WAIT_PEN_CHANGE or p.status is PalletStatus.MOVING_TO_Z2 or p.status is PalletStatus.MOVING_TO_Z3 or p.status is PalletStatus.MOVING_TO_Z4 or p.status is PalletStatus.MOVING_TO_Z5 or p.status is PalletStatus.DRAWING:
                 self.status.changeColor(StatusCode.WORKING)
