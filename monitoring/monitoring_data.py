@@ -37,7 +37,7 @@ class MonitoringEventDAO:
         logging.debug(allEvents)
 
     def get_all_events(self):
-        self.c.execute("SELECT * FROM event WHERE 1")
+        self.c.execute("""SELECT * FROM event WHERE 1""")
         events = self.c.fetchall()
         return events
 

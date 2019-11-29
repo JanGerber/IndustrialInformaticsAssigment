@@ -4,6 +4,7 @@ import uuid
 import requests
 
 from enum.zone import Zone
+from exceptions.workstation_exception import WorkstationError
 
 
 class Conveyor:
@@ -25,6 +26,7 @@ class Conveyor:
                 "Conveyor: move pallet error (Z" + str(zoneStart.value) + " to " + str(
                     zoneEnd.value) + ") Status Code: " + str(
                     r.status_code))
+            raise WorkstationError("An error occurred when trying to move the pallet to the next zone.")
 
     def getZoneStatus(self, zone: Zone):
         url = self.hostIP + self.baseService + "/Z" + str(zone.value)
@@ -33,7 +35,9 @@ class Conveyor:
             r = requests.get(url, json={"destUrl": ""})
         else:
             r = requests.post(url, json={"destUrl": ""})
-
+        if r.status_code != 200:
+            logging.error("Conveyor: get zone status error (Z" + str(zone.value) + ")")
+            raise WorkstationError("An error occurred when trying to move the pallet to the next zone.")
         reqMsg = r.json()
         palletID = reqMsg["PalletID"]
 

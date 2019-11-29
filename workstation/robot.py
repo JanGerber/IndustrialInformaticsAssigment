@@ -5,6 +5,7 @@ import requests
 
 from enum.phone_color import PhoneColor
 from enum.phone_shape import PhoneShape
+from exceptions.workstation_exception import WorkstationError
 
 
 class Robot:
@@ -35,6 +36,7 @@ class Robot:
         else:
             logging.error(
                 "Robot: select pen failure, color: " + str(color.name) + ", Status Code: " + str(r.status_code))
+            raise WorkstationError("An error occurred when starting to change the pen.")
 
     def executeDrawing(self, shape: PhoneShape, color: PhoneColor):
         if color != self.getPenColor():
@@ -46,11 +48,18 @@ class Robot:
         else:
             logging.error("Robot: execute drawing failure, color: " + str(color.name) + ", shape: " + str(
                 shape.name) + " Status Code: " + str(r.status_code))
+            raise WorkstationError("An error occurred when starting to execute the drawing.")
 
     def getPenColor(self) -> PhoneColor:
         logging.info("Robot: get pen color")
         url = self.hostIP + self.baseService + "/GetPenColor"
         r = requests.post(url, json={})
         logging.debug(r.json())
-
-        return PhoneColor.RED  # TODO read data from request
+        response = r.json()
+        if response == "red":
+            return PhoneColor.RED
+        if response == "green":
+            return PhoneColor.GREEN
+        if response == "blue":
+            return PhoneColor.BLUE
+        raise WorkstationError("An error has occurred while retrieving the pen color.")
