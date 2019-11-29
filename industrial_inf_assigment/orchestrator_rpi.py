@@ -22,13 +22,18 @@ class Orchestrator:
 
     def runOrchestation(self):
         while True:
+            try:
+                self.testNextStepInZone1()
+                self.testNextStepInZone2()
+                self.testNextStepInZone3()
+                self.testNextStepInZone4()
+                # self.testNextStepInZone5()
+                self.printPalletInfos()
+                self.testForWorking()
+            except:
+                self.status.changeColor(StatusCode.ERROR)
+                logging.error("Orchestrator: Something went wrong")
 
-            self.testNextStepInZone1()
-            self.testNextStepInZone2()
-            self.testNextStepInZone3()
-            self.testNextStepInZone4()
-            self.printPalletInfos()
-            self.testForWorking()
             time.sleep(5)
 
     def addNewOrder(self, phone: Phone):
@@ -101,11 +106,12 @@ class Orchestrator:
         pallet.status = PalletStatus.WAITING
 
     def zone5ChangedEvent(self, palletId: int):
-        if palletId == -1:
+        if palletId == -1 or palletId == str("-1"):
             pallet = self.getPalletOnByStatus(PalletStatus.WAIT_FOR_REMOVAL)
             if pallet is None:
                 return
             self.ws.pallets.remove(pallet)
+            logging.debug("Orchestrator: remove Pallet")
             return
         pallet = self.getPalletOnByStatus(PalletStatus.MOVING_TO_Z5)
         if pallet is None:
@@ -164,6 +170,8 @@ class Orchestrator:
                 logging.info("Orchestrator: change pen")
                 pallet.status = PalletStatus.WAIT_PEN_CHANGE
                 self.ws.robot.selectPen(pallet.phone.color)
+            else:
+                pallet.status = PalletStatus.WAIT_FOR_MOVING
         if pallet.status == PalletStatus.WAIT_FOR_MOVING and not self.testIfAnyPalletIsInZone(Zone.Z3):
             logging.info("Orchestrator: move pallet from zone 2 to zone 3")
             pallet.status = PalletStatus.MOVING_TO_Z3
@@ -227,6 +235,7 @@ class Orchestrator:
             self.addPhoneToPallet(self.bufferOrder.pop())
 
     def printPalletInfos(self):
+        logging.info("---------------------- Pallets in WS ----------------------")
         for p in self.ws.pallets:
             p.printPalletInfo()
 

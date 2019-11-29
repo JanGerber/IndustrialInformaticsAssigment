@@ -16,13 +16,13 @@ logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(asctime)s - %
 
 
 # Workstations
-w2BaseUrl = "http://192.168.9"
+w2BaseUrl = "http://192.168.10"
 w2 = Workstation(w2BaseUrl, None)
 
 # Subscribers
 raspberryPiAddress = "http://192.168.0.108:5000"
 sub = Subscriber(raspberryPiAddress)
-# sub.subscribeToAllEventsOfWS(w2)
+sub.subscribeToAllEventsOfWS(w2)
 
 # Orchestration
 orchestratorStatus = OrchestratorStatus()
