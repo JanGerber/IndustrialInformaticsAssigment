@@ -1,6 +1,8 @@
 import logging
 import sqlite3
 
+from enum.event import Event
+
 
 class MonitoringEventDAO:
 
@@ -25,7 +27,7 @@ class MonitoringEventDAO:
         logging.debug("Inserting event:")
         logging.debug(event)
         with self.conn:
-            self.c.execute("INSERT INTO event VALUES (NULL,:eventID, :ws, :senderID :payload, :serverTime)",
+            self.c.execute("""INSERT INTO event VALUES (NULL, :eventID, :ws, :senderID, :payload, :serverTime)""",
                            {'eventID': event["eventID"], 'ws': event["ws"], 'senderID': event['senderID'],
                             'payload': event["payload"], 'serverTime': event["serverTime"]})
 
@@ -38,3 +40,6 @@ class MonitoringEventDAO:
         self.c.execute("SELECT * FROM event WHERE 1")
         events = self.c.fetchall()
         return events
+
+    def getLastEvent(self, event: Event):
+        pass

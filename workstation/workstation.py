@@ -1,8 +1,8 @@
 import logging
 import uuid
 
-from industrial_inf_assigment.conveyor import Conveyor
-from industrial_inf_assigment.robot import Robot
+from workstation.conveyor import Conveyor
+from workstation.robot import Robot
 
 
 class Workstation:

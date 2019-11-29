@@ -6,9 +6,9 @@ import threading
 from flask import Flask, render_template
 from flask import request
 
-from industrial_inf_assigment.monitoring_data import MonitoringEventDAO
-from industrial_inf_assigment.subsciber import Subscriber
-from industrial_inf_assigment.workstation import Workstation
+from monitoring.monitoring_data import MonitoringEventDAO
+from workstation.subsciber import Subscriber
+from workstation.workstation import Workstation
 
 # Logging
 logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(asctime)s - %(message)s',

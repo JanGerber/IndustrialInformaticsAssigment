@@ -1,10 +1,10 @@
 import logging
 import uuid
 
-from industrial_inf_assigment.enum.pallet_status import PalletStatus
-from industrial_inf_assigment.workstation import Workstation
-from industrial_inf_assigment.phone import Phone
-from industrial_inf_assigment.enum.zone import Zone
+from enum.pallet_status import PalletStatus
+from workstation.workstation import Workstation
+from workstation.phone import Phone
+from enum.zone import Zone
 
 
 class Pallet:

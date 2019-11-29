@@ -2,8 +2,8 @@ import logging
 
 import requests
 
-from industrial_inf_assigment.workstation import Workstation
-from industrial_inf_assigment.enum.zone import Zone
+from workstation.workstation import Workstation
+from enum.zone import Zone
 
 
 class Subscriber:

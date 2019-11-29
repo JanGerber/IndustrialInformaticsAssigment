@@ -1,7 +1,7 @@
 import logging
 
-from industrial_inf_assigment.enum.phone_color import PhoneColor
-from industrial_inf_assigment.enum.phone_shape import PhoneShape
+from enum.phone_color import PhoneColor
+from enum.phone_shape import PhoneShape
 
 
 class Phone:

@@ -4,11 +4,11 @@ import threading
 
 from flask import Flask, request
 
-from industrial_inf_assigment.orchestrator_input import OrchestratorInput
-from industrial_inf_assigment.orchestrator_rpi import Orchestrator
-from industrial_inf_assigment.orchestrator_status import OrchestratorStatus
-from industrial_inf_assigment.subsciber import Subscriber
-from industrial_inf_assigment.workstation import Workstation
+from orchestration.orchestrator_input import OrchestratorInput
+from orchestration.orchestrator_rpi import Orchestrator
+from orchestration.orchestrator_status import OrchestratorStatus
+from workstation.subsciber import Subscriber
+from workstation.workstation import Workstation
 
 # Logging
 logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(asctime)s - %(message)s',
