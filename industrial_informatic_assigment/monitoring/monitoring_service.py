@@ -42,8 +42,8 @@ class MonitoringService:
         if event is None:
             status = {"": ""}
         else:
-            payload = json.loads("\"" + event.payload + "\"")
-            status = {"PalletID": payload[0]}
+            payload = json.loads(event.payload)
+            status = {"PalletID": payload["PalletID"]}
         return status
 
     def checkForNewAlarms(self):
@@ -92,9 +92,9 @@ class MonitoringService:
 
         if newest.eventID == Events.PEN_CHANGE_STARTED.value or newest.eventID == Events.PEN_CHANGE_ENDED.value:
             payload = json.loads(newest.payload)
-            statusList.append({"PenColor": payload})
+            statusList.append({"PenColor": payload["PenColor"]})
         elif newest.eventID == Events.DRAW_END_EXECUTION.value or newest.eventID == Events.DRAW_START_EXECUTION.value:
-            payload = json.loads("\"" + newest.payload + "\"")
+            payload = json.loads(newest.payload)
             statusList.append({"Recipe": payload["Recipe"]})
             statusList.append({"PenColor": payload["PenColor"]})
         return statusList

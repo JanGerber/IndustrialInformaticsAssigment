@@ -56,10 +56,10 @@ class Robot:
         r = requests.post(url, json={})
         logging.debug(r.json())
         response = r.json()
-        if response == "red":
+        if response["CurrentPen"] == "red":
             return PhoneColor.RED
-        if response == "green":
+        if response["CurrentPen"] == "green":
             return PhoneColor.GREEN
-        if response == "blue":
+        if response["CurrentPen"] == "blue":
             return PhoneColor.BLUE
         raise WorkstationError("An error has occurred while retrieving the pen color.")

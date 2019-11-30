@@ -32,8 +32,8 @@ class Orchestrator:
                 self.testForWorking()
             except WorkstationError as e:
                 self.status.changeColor(StatusCode.ERROR)
-                logging.error("Orchestrator: Something went wrong" + e)
-
+                logging.error("Orchestrator: Something went wrong")
+                logging.error(e)
             time.sleep(5)
 
     def addNewOrder(self, phone: Phone):
