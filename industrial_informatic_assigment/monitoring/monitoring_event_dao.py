@@ -1,3 +1,4 @@
+import json
 import logging
 import sqlite3
 from threading import Lock
@@ -14,6 +15,7 @@ class MonitoringEventDAO:
         else:
             self.conn = sqlite3.connect('monitoring.db', check_same_thread=False)
 
+        self.conn.row_factory = lambda c, r: dict(zip([col[0] for col in c.description], r))
         self.lock = Lock()
         self.c = self.conn.cursor()
         self.lock.acquire(True)
@@ -31,11 +33,12 @@ class MonitoringEventDAO:
     def insert_event(self, event):
         logging.debug("MonitoringEventDAO: inserting new event")
         logging.debug(event)
+        payload = json.dumps(event["payload"])
         with self.conn:
             self.lock.acquire(True)
             self.c.execute("""INSERT INTO event VALUES (NULL, :eventID, :ws, :senderID, :payload, :serverTime)""",
                            {'eventID': event["eventID"], 'ws': event["ws"], 'senderID': event['senderID'],
-                            'payload': event["payload"], 'serverTime': event["serverTime"]})
+                            'payload': payload, 'serverTime': event["serverTime"]})
             self.lock.release()
 
     def display_all_events(self):

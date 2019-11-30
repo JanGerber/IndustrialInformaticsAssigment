@@ -1,7 +1,7 @@
 class EventWS:
 
-    def __init__(self, id, eventID, ws, senderID, payload, serverTime):
-        self.id = id
+    def __init__(self, dbId, eventID, ws, senderID, payload, serverTime):
+        self.id = dbId
         self.eventID = eventID
         self.ws = ws
         self.senderID = senderID

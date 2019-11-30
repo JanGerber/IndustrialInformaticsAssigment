@@ -30,9 +30,9 @@ class Orchestrator:
                 self.testNextStepInZone4()
                 self.printPalletInfos()
                 self.testForWorking()
-            except WorkstationError:
+            except WorkstationError as e:
                 self.status.changeColor(StatusCode.ERROR)
-                logging.error("Orchestrator: Something went wrong")
+                logging.error("Orchestrator: Something went wrong" + e)
 
             time.sleep(5)
 

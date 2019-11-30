@@ -12,7 +12,7 @@ class MonitoringAlarmDAO:
             self.conn = sqlite3.connect(':memory:', check_same_thread=False)
         else:
             self.conn = sqlite3.connect('monitoring.db', check_same_thread=False)
-
+        self.conn.row_factory = lambda c, r: dict(zip([col[0] for col in c.description], r))
         self.lock = Lock()
         self.c = self.conn.cursor()
         self.lock.acquire(True)

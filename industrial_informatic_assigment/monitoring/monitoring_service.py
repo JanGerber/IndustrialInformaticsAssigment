@@ -6,7 +6,6 @@ from industrial_informatic_assigment.monitoring import event_ws
 from industrial_informatic_assigment.monitoring.event_ws import EventWS
 from industrial_informatic_assigment.monitoring.monitoring_alarm_dao import MonitoringAlarmDAO
 from industrial_informatic_assigment.monitoring.monitoring_event_dao import MonitoringEventDAO
-from industrial_informatic_assigment.monitoring.status import Status
 from industrial_informatic_assigment.monitoring.workstation_status import WorkstationStatus
 
 
@@ -43,8 +42,8 @@ class MonitoringService:
         if event is None:
             status = {"": ""}
         else:
-            payload = json.loads(event.payload)
-            status = {"PalletID": payload["PalletID"]}
+            payload = json.loads("\"" + event.payload + "\"")
+            status = {"PalletID": payload[0]}
         return status
 
     def checkForNewAlarms(self):
@@ -74,13 +73,13 @@ class MonitoringService:
         events: List[EventWS] = []
         statusList = []
         if eventPenStart is not None:
-            events = eventPenStart
-        if eventPenStart is not None:
-            events = eventPenStart
-        if eventPenStart is not None:
-            events = eventPenStart
-        if eventPenStart is not None:
-            events = eventPenStart
+            events.append(eventPenStart)
+        if eventPenEnd is not None:
+            events.append(eventPenEnd)
+        if eventDrawStart is not None:
+            events.append(eventDrawStart)
+        if eventDrawEnd is not None:
+            events.append(eventDrawEnd)
         if len(events) == 0:
             return statusList
         newest: EventWS = None
@@ -92,10 +91,12 @@ class MonitoringService:
                 newest = e
 
         if newest.eventID == Events.PEN_CHANGE_STARTED.value or newest.eventID == Events.PEN_CHANGE_ENDED.value:
-            statusList.append({"PenColor": newest.payload["PenColor"]})
+            payload = json.loads(newest.payload)
+            statusList.append({"PenColor": payload})
         elif newest.eventID == Events.DRAW_END_EXECUTION.value or newest.eventID == Events.DRAW_START_EXECUTION.value:
-            statusList.append({"Recipe": newest.payload["Recipe"]})
-            statusList.append({"PenColor": newest.payload["PenColor"]})
+            payload = json.loads("\"" + newest.payload + "\"")
+            statusList.append({"Recipe": payload["Recipe"]})
+            statusList.append({"PenColor": payload["PenColor"]})
         return statusList
 
     def checkForDrawingNotEnded(self, startDrawEvent, endDrawEvent):
