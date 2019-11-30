@@ -4,11 +4,11 @@ import threading
 
 from flask import Flask, request
 
-from orchestration.orchestrator_input import OrchestratorInput
-from orchestration.orchestrator_rpi import Orchestrator
-from orchestration.orchestrator_status import OrchestratorStatus
-from workstation.subsciber import Subscriber
-from workstation.workstation import Workstation
+from industrial_informatic_assigment.orchestration.orchestrator_input import OrchestratorInput
+from industrial_informatic_assigment.orchestration.orchestrator_rpi import Orchestrator
+from industrial_informatic_assigment.orchestration.orchestrator_status import OrchestratorStatus
+from industrial_informatic_assigment.workstation.subsciber import Subscriber
+from industrial_informatic_assigment.workstation.workstation import Workstation
 
 # Logging
 logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(asctime)s - %(message)s',
@@ -39,7 +39,7 @@ def runFlaskApp():
 
 
 # Threads
-threadOrchestration = threading.Thread(target=orchestrator.runOrchestation, args=())
+threadOrchestration = threading.Thread(target=orchestrator.runOrchestration, args=())
 threadOrchestrationInput = threading.Thread(target=orchestratorInput.startListening, args=())
 threadOrchestrationStatus = threading.Thread(target=orchestratorStatus.blink, args=())
 threadFlask = threading.Thread(target=runFlaskApp, args=())

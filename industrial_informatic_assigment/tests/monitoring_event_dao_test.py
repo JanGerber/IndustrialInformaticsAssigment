@@ -1,7 +1,7 @@
 import datetime
 import unittest
 
-from monitoring.monitoring_data import MonitoringEventDAO
+from industrial_informatic_assigment.monitoring.monitoring_event_dao import MonitoringEventDAO
 
 
 class EventDataDAOTestCase(unittest.TestCase):

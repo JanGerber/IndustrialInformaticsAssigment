@@ -3,8 +3,8 @@ import uuid
 
 import requests
 
-from enum.zone import Zone
-from exceptions.workstation_exception import WorkstationError
+from industrial_informatic_assigment.enum.zone import Zone
+from industrial_informatic_assigment.exceptions.workstation_exception import WorkstationError
 
 
 class Conveyor:

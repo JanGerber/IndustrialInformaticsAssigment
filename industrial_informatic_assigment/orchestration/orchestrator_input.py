@@ -3,10 +3,10 @@ import time
 
 import explorerhat
 
-from orchestration.orchestrator_rpi import Orchestrator
-from workstation.phone import Phone
-from enum.phone_color import PhoneColor
-from enum.phone_shape import PhoneShape
+from industrial_informatic_assigment.orchestration.orchestrator_rpi import Orchestrator
+from industrial_informatic_assigment.workstation.phone import Phone
+from industrial_informatic_assigment.enum.phone_color import PhoneColor
+from industrial_informatic_assigment.enum.phone_shape import PhoneShape
 
 
 class OrchestratorInput:

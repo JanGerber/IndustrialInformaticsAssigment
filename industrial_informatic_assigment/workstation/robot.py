@@ -3,9 +3,9 @@ import uuid
 
 import requests
 
-from enum.phone_color import PhoneColor
-from enum.phone_shape import PhoneShape
-from exceptions.workstation_exception import WorkstationError
+from industrial_informatic_assigment.enum.phone_color import PhoneColor
+from industrial_informatic_assigment.enum.phone_shape import PhoneShape
+from industrial_informatic_assigment.exceptions.workstation_exception import WorkstationError
 
 
 class Robot:

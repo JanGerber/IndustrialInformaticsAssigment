@@ -2,13 +2,16 @@ import datetime
 import json
 import logging
 import threading
+import time
 
 from flask import Flask, render_template
 from flask import request
 
-from monitoring.monitoring_data import MonitoringEventDAO
-from workstation.subsciber import Subscriber
-from workstation.workstation import Workstation
+from industrial_informatic_assigment.monitoring.monitoring_alarm_dao import MonitoringAlarmDAO
+from industrial_informatic_assigment.monitoring.monitoring_event_dao import MonitoringEventDAO
+from industrial_informatic_assigment.monitoring.monitoring_service import MonitoringService
+from industrial_informatic_assigment.workstation.subsciber import Subscriber
+from industrial_informatic_assigment.workstation.workstation import Workstation
 
 # Logging
 logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(asctime)s - %(message)s',
@@ -22,10 +25,13 @@ ws = Workstation(w2BaseUrl, None)
 locPort = 5000
 serverAddress = "http://192.168.103.202:" + str(locPort)
 subscriber = Subscriber(serverAddress)
-subscriber.subscribeToAllEventsOfWsSimple(ws)
+# subscriber.subscribeToAllEventsOfWsSimple(ws)
 
 # DB
 eventDAO = MonitoringEventDAO(False)
+alarmDAO = MonitoringAlarmDAO(False)
+# Service
+monitoringService = MonitoringService(eventDAO, alarmDAO)
 
 
 app = Flask(__name__)
@@ -59,24 +65,17 @@ def getEvents():
     return allEventsJson
 
 
-@app.route('/conveyor/state', methods=['GET'])
-def getState():
-    logging.debug("Retrieving the conveyor state...")
-    now = datetime.datetime.now()
-    time = now.isoformat()
-    cnvMsg = {'conveyorID': 5, 'state': "working", "serverTime": time}
-    cnvMsg_str = json.dumps(cnvMsg)
+@app.route('/rest/ws/status', methods=['GET'])
+def getWsStatus():
+    status = monitoringService.getStatusOfWS()
+    cnvMsg_str = json.dumps(vars(status))
     return cnvMsg_str
 
-    logging.debug("Saving the conveyor state...")
-    content = request.json
-    logging.debug(content)
-    newState = content["state"]
-    logging.debug(newState)
-    now = datetime.datetime.now()
-    time = now.isoformat()
-    cnvMsg = {'conveyorID': 5, 'state': newState, "serverTime": time}
-    cnvMsg_str = json.dumps(cnvMsg)
+
+@app.route('/rest/alarm', methods=['GET'])
+def getAllAlarms():
+    alarms = monitoringService.getAllAlarms()
+    cnvMsg_str = json.dumps(alarms)
     return cnvMsg_str
 
 
@@ -92,7 +91,7 @@ def detect_time_elapsed_alarms():
 # Find alarms
 def checkTimeElapsedAlarms():
     #logging.debug("Checking DB for alarms")
-    detect_time_elapsed_alarms()
+    monitoringService.checkForNewAlarms()
     threading.Timer(5.0, checkTimeElapsedAlarms).start()
 
 

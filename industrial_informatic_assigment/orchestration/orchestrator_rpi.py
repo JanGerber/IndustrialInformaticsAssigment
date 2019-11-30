@@ -2,14 +2,14 @@ import logging
 import time
 import uuid
 
-from exceptions.workstation_exception import WorkstationError
-from orchestration.orchestrator_status import OrchestratorStatus
-from workstation.pallet import Pallet
-from enum.pallet_status import PalletStatus
-from workstation.phone import Phone
-from enum.status_code import StatusCode
-from workstation.workstation import Workstation
-from enum.zone import Zone
+from industrial_informatic_assigment.exceptions.workstation_exception import WorkstationError
+from industrial_informatic_assigment.orchestration.orchestrator_status import OrchestratorStatus
+from industrial_informatic_assigment.workstation.pallet import Pallet
+from industrial_informatic_assigment.enum.pallet_status import PalletStatus
+from industrial_informatic_assigment.workstation.phone import Phone
+from industrial_informatic_assigment.enum.status_code import StatusCode
+from industrial_informatic_assigment.workstation.workstation import Workstation
+from industrial_informatic_assigment.enum.zone import Zone
 
 
 class Orchestrator:
@@ -21,7 +21,7 @@ class Orchestrator:
         self.status = orchestratorStatus
         logging.debug("Initialization: new orchestrator  (" + str(self.orchestratorID) + ")")
 
-    def runOrchestation(self):
+    def runOrchestration(self):
         while True:
             try:
                 self.testNextStepInZone1()
