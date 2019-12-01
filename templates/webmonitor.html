@@ -17,6 +17,13 @@
         .row-whith-wide-cards .card {
             width: 100%;
         }
+
+        .alert-fixed {
+            position: fixed;
+            z-index: 9999;
+            margin: 5px;
+            width: 85%;
+        }
     </style>
 </head>
 
@@ -34,9 +41,19 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="/webmonitor">Events
-                        <span class="sr-only">(current)</span>
+                <li class="nav-item">
+                    <a class="nav-link" href="#status">Current Status
+                        <!--                        <span class="sr-only">(current)</span>-->
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#events">Events
+                        <!--                        <span class="sr-only">(current)</span>-->
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#alarms">Alarms
+                        <!--                        <span class="sr-only">(current)</span>-->
                     </a>
                 </li>
             </ul>
@@ -45,8 +62,12 @@
 </nav>
 
 
-<div class="container">
-    <div class="row mt-4">
+<div class="container mt-4">
+
+    <div class="row alert-fixed" id="alarmNotifications">
+
+    </div>
+    <div class="row mt-4" id="status">
         <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="card">
                 <div class="card-header">
@@ -64,33 +85,33 @@
                         <tbody>
                         <tr>
                             <th scope="row">Zone 1</th>
-                            <td></td>
-                            <td></td>
+                            <td id="statuszone1"></td>
+                            <td id="timezone1"></td>
                         </tr>
                         <tr>
                             <th scope="row">Zone 2</th>
-                            <td></td>
-                            <td></td>
+                            <td id="statuszone2"></td>
+                            <td id="timezone2"></td>
                         </tr>
                         <tr>
                             <th scope="row">Zone 3</th>
-                            <td></td>
-                            <td></td>
+                            <td id="statuszone3"></td>
+                            <td id="timezone3"></td>
                         </tr>
                         <tr>
                             <th scope="row">Zone 4</th>
-                            <td></td>
-                            <td></td>
+                            <td id="statuszone4"></td>
+                            <td id="timezone4"></td>
                         </tr>
                         <tr>
                             <th scope="row">Zone 5</th>
-                            <td></td>
-                            <td></td>
+                            <td id="statuszone5"></td>
+                            <td id="timezone5"></td>
                         </tr>
                         <tr>
                             <th scope="row">Robot</th>
-                            <td></td>
-                            <td></td>
+                            <td id="statusrobot"></td>
+                            <td id="timerobot"></td>
                         </tr>
                         </tbody>
                     </table>
@@ -98,14 +119,14 @@
             </div>
         </div>
     </div>
-    <div class="row mt-4">
+    <div class="row mt-4" id="events">
         <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="card">
                 <div class="card-header">
                     Events
                 </div>
                 <div class="card-body">
-                    <table class="table">
+                    <table class="table table-sm table-hover">
                         <thead class="thead-light">
                         <tr>
                             <th scope="col">ID</th>
@@ -121,14 +142,14 @@
             </div>
         </div>
     </div>
-    <div class="row mt-4">
+    <div class="row mt-4" id="alarms">
         <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="card">
                 <div class="card-header">
                     Alarms
                 </div>
                 <div class="card-body">
-                    <table class="table">
+                    <table class="table table-sm table-hover">
                         <thead class="thead-light">
                         <tr>
                             <th scope="col">ID</th>
@@ -145,22 +166,28 @@
         </div>
     </div>
 </div>
+<!-- Footer -->
+<footer class="py-4 bg-dark mt-4">
+    <div class="container">
+        <p class="m-0 text-center text-white">Copyright &copy; Jan Gerber, Radim Karni&scaron;, Bernhard Mayrhofer</p>
+        <p class="m-0 text-center text-white">Industrial Informatics 2019</p>
+    </div>
+    <!-- /.container -->
+</footer>
 <script>
     let currentAlarmId = 0;
+    let alarmLoadFirst = false;
 
     function getAllEvents() {
-        console.log("get state routine...");
-
         $.get("/rest/events", function (data) {
             let events = JSON.parse(data);
-            console.log(events);
             txt = "";
             for (x in events) {
-                let date = new Date(events[x][5]);
+                let date = new Date(events[x]["serverTime"]);
                 txt += "<tr>";
-                txt += "<th scope=\"row\">" + events[x][0] + "</th>";
-                txt += "<td>" + events[x][1] + "</td>";
-                txt += "<td>" + events[x][4] + "</td>";
+                txt += "<th scope=\"row\">" + events[x]['id'] + "</th>";
+                txt += "<td>" + events[x]['eventID'] + "</td>";
+                txt += "<td>" + events[x]['payload'] + "</td>";
                 txt += "<td>" + date.toISOString() + "</td>";
                 txt += "</tr>"
             }
@@ -170,20 +197,25 @@
     }
 
     function getAllAlarms() {
-        console.log("get state routine...");
-
         $.get("/rest/alarm", function (data) {
             let alarms = JSON.parse(data);
-            console.log(alarms);
             txt = "";
+            let highestAlarmId = 0;
             for (x in alarms) {
-                let date = new Date(alarms[x][3]);
+                let date = new Date(alarms[x]["serverTime"]);
                 txt += "<tr>";
-                txt += "<th scope=\"row\">" + alarms[x][0] + "</th>";
-                txt += "<td>" + alarms[x][1] + "</td>";
-                txt += "<td>" + alarms[x][2] + "</td>";
+                txt += "<th scope=\"row\">" + alarms[x]["id"] + "</th>";
+                txt += "<td>" + alarms[x]["alarmtype"] + "</td>";
+                txt += "<td>" + alarms[x]["description"] + "</td>";
                 txt += "<td>" + date.toISOString() + "</td>";
-                txt += "</tr>"
+                txt += "</tr>";
+                if (alarms[x]["id"] > highestAlarmId) {
+                    highestAlarmId = alarms[x]["id"]
+                }
+            }
+            if (!alarmLoadFirst) {
+                currentAlarmId = highestAlarmId;
+                alarmLoadFirst = true;
             }
             document.getElementById("alarmData").innerHTML = txt;
 
@@ -191,21 +223,112 @@
     }
 
     function getCurrentStatus() {
-        console.log("get state routine...");
-
         $.get("/rest/ws/status", function (data) {
-            let statusWS = JSON.parse(data)
+            let statusWS = JSON.parse(data);
+            for (s in statusWS["zone1"]) {
+                if (statusWS["zone1"][s].hasOwnProperty("serverTime")) {
+                    document.getElementById("timezone1").innerHTML = statusWS["zone1"][s]["serverTime"];
+                }
+                if (statusWS["zone1"][s].hasOwnProperty("Status")) {
+                    document.getElementById("statuszone1").innerHTML = statusWS["zone1"][s]["Status"];
+                }
+
+            }
+            for (s in statusWS["zone2"]) {
+                if (statusWS["zone2"][s].hasOwnProperty("serverTime")) {
+                    document.getElementById("timezone2").innerHTML = statusWS["zone2"][s]["serverTime"];
+                }
+                if (statusWS["zone2"][s].hasOwnProperty("Status")) {
+                    document.getElementById("statuszone2").innerHTML = statusWS["zone2"][s]["Status"];
+                }
+            }
+            for (s in statusWS["zone3"]) {
+                if (statusWS["zone4"][s].hasOwnProperty("serverTime")) {
+                    document.getElementById("timezone3").innerHTML = statusWS["zone3"][s]["serverTime"];
+                }
+                if (statusWS["zone3"][s].hasOwnProperty("Status")) {
+                    document.getElementById("statuszone3").innerHTML = statusWS["zone3"][s]["Status"];
+                }
+            }
+            for (s in statusWS["zone4"]) {
+                if (statusWS["zone4"][s].hasOwnProperty("serverTime")) {
+                    document.getElementById("timezone4").innerHTML = statusWS["zone4"][s]["serverTime"];
+                }
+                if (statusWS["zone4"][s].hasOwnProperty("Status")) {
+                    document.getElementById("statuszone4").innerHTML = statusWS["zone4"][s]["Status"];
+                }
+            }
+            for (s in statusWS["zone5"]) {
+                if (statusWS["zone5"][s].hasOwnProperty("serverTime")) {
+                    document.getElementById("timezone5").innerHTML = statusWS["zone5"][s]["serverTime"];
+                }
+                if (statusWS["zone5"][s].hasOwnProperty("Status")) {
+                    document.getElementById("statuszone5").innerHTML = statusWS["zone5"][s]["Status"];
+                }
+            }
+            for (s in statusWS["robot"]) {
+                if (statusWS["robot"][s].hasOwnProperty("serverTime")) {
+                    document.getElementById("timerobot").innerHTML = statusWS["robot"][s]["serverTime"];
+                }
+                if (statusWS["robot"][s].hasOwnProperty("Status")) {
+                    document.getElementById("statusrobot").innerHTML = statusWS["robot"][s]["Status"];
+                }
+            }
+
 
         });
     }
 
+    function getNewAlarms() {
+        let data = {'alarmId': currentAlarmId};
+        $.ajax({
+            type: "POST",
+            url: "/rest/alarm/new",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function (response) {
+                data = JSON.parse(response);
+                for (x in data) {
+                    if (currentAlarmId < data[x]["id"]) {
+                        currentAlarmId = data[x]["id"]
+                    }
+                    let errorMessage = "<div class=\"col-sm-12 col-md-12 col-lg-12\">";
+                    errorMessage += "<div class=\"alert alert-warning alert-dismissible fade show\" role=\"alert\">";
+                    errorMessage += " <strong>" + data[x]["alarmtype"] + " </strong> " + data[x]["description"];
+                    errorMessage += "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">";
+                    errorMessage += "<span aria-hidden=\"true\">&times;</span>";
+                    errorMessage += " </button>";
+                    errorMessage += "</div> </div>";
+                    document.getElementById("alarmNotifications").innerHTML = document.getElementById("alarmNotifications").innerHTML + errorMessage
+                }
+
+            }
+        });
+    }
 
     window.setInterval(function () {
         getAllEvents();
         getCurrentStatus();
         getAllAlarms();
-    }, 2000);
+        if (alarmLoadFirst) {
+            getNewAlarms()
+        }
+    }, 1500);
 
+    $(function () {
+        $('a[href*="#"]:not([href="#"])').click(function () {
+            if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') && location.hostname == this.hostname) {
+                var target = $(this.hash);
+                target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
+                if (target.length) {
+                    $('html, body').animate({
+                        scrollTop: target.offset().top - 58
+                    }, 1000);
+                    return false;
+                }
+            }
+        });
+    });
 
 </script>
 

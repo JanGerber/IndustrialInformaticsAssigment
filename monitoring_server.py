@@ -2,7 +2,6 @@ import datetime
 import json
 import logging
 import threading
-import time
 
 from flask import Flask, render_template
 from flask import request
@@ -25,14 +24,14 @@ ws = Workstation(w2BaseUrl, None)
 locPort = 5000
 serverAddress = "http://192.168.101.200:" + str(locPort)
 subscriber = Subscriber(serverAddress)
-subscriber.subscribeToAllEventsOfWsSimple(ws)
+# subscriber.subscribeToAllEventsOfWsSimple(ws)
 
 # DB
 eventDAO = MonitoringEventDAO(False)
 alarmDAO = MonitoringAlarmDAO(False)
+
 # Service
 monitoringService = MonitoringService(eventDAO, alarmDAO)
-
 
 app = Flask(__name__)
 
@@ -41,9 +40,7 @@ app = Flask(__name__)
 def static_page(page_name):
     return render_template('%s.html' % page_name)
 
-# Events API
 
-# Add event
 @app.route('/rest/ws/<string:wsId>/event', methods=['POST'])
 def index(wsId):
     eventDesc = request.json
@@ -79,18 +76,16 @@ def getAllAlarms():
     return cnvMsg_str
 
 
-def detect_time_elapsed_alarms():
-    pass
-    # logging.debug("Checking for time elapsed alarms...")
-    # sqlSt="SELECT * FROM event WHERE 1"
-    # c.execute(sqlSt)
-    # allRobots=c.fetchall()
-    # logging.info(allRobots)
+@app.route('/rest/alarm/new', methods=['POST'])
+def getAllNewAlarms():
+    eventDesc = request.json
+    alarmId = eventDesc['alarmId']
+    alarms = monitoringService.getAllNewAlarms(alarmId)
+    cnvMsg_str = json.dumps(alarms)
+    return cnvMsg_str
 
 
-# Find alarms
 def checkTimeElapsedAlarms():
-    #logging.debug("Checking DB for alarms")
     monitoringService.checkForNewAlarms()
     threading.Timer(5.0, checkTimeElapsedAlarms).start()
 

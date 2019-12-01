@@ -1,7 +1,9 @@
 import json
 from typing import List
 
+from industrial_informatic_assigment.enum.conveyor_status import ConveyorStatus
 from industrial_informatic_assigment.enum.events import Events
+from industrial_informatic_assigment.enum.robot_status import RobotStatus
 from industrial_informatic_assigment.monitoring import event_ws
 from industrial_informatic_assigment.monitoring.event_ws import EventWS
 from industrial_informatic_assigment.monitoring.monitoring_alarm_dao import MonitoringAlarmDAO
@@ -39,11 +41,19 @@ class MonitoringService:
         return WorkstationStatus(statusZ1, statusZ2, statusZ3, statusZ4, statusZ5, statusRobot)
 
     def getStatusOfZone(self, event: event_ws):
+        status = []
         if event is None:
-            status = {"": ""}
+            status.append({"PalletID": "-"})
+            status.append({"serverTime": "-"})
+            status.append({"Status": ConveyorStatus.UNKNOWN.value})
         else:
             payload = json.loads(event.payload)
-            status = {"PalletID": payload["PalletID"]}
+            status.append({"PalletID": payload["PalletID"]})
+            status.append({"serverTime": event.serverTime})
+            if payload["PalletID"] == -1 or payload["PalletID"] == "-1":
+                status.append({"Status": ConveyorStatus.FREE.value})
+            else:
+                status.append({"Status": ConveyorStatus.OCCUPIED.value})
         return status
 
     def checkForNewAlarms(self):
@@ -81,6 +91,7 @@ class MonitoringService:
         if eventDrawEnd is not None:
             events.append(eventDrawEnd)
         if len(events) == 0:
+            statusList.append({"Status": RobotStatus.UNKNOWN.value})
             return statusList
         newest: EventWS = None
         for e in events:
@@ -90,13 +101,27 @@ class MonitoringService:
             if e.serverTime > newest.serverTime:
                 newest = e
 
-        if newest.eventID == Events.PEN_CHANGE_STARTED.value or newest.eventID == Events.PEN_CHANGE_ENDED.value:
+        if newest.eventID == Events.PEN_CHANGE_STARTED.value:
             payload = json.loads(newest.payload)
             statusList.append({"PenColor": payload["PenColor"]})
-        elif newest.eventID == Events.DRAW_END_EXECUTION.value or newest.eventID == Events.DRAW_START_EXECUTION.value:
+            statusList.append({"Status": RobotStatus.PEN_CHANGE.value})
+        elif newest.eventID == Events.PEN_CHANGE_ENDED.value:
+            payload = json.loads(newest.payload)
+            statusList.append({"PenColor": payload["PenColor"]})
+            statusList.append({"Status": RobotStatus.IDLE.value})
+        elif newest.eventID == Events.DRAW_END_EXECUTION.value:
             payload = json.loads(newest.payload)
             statusList.append({"Recipe": payload["Recipe"]})
             statusList.append({"PenColor": payload["PenColor"]})
+            statusList.append({"Status": RobotStatus.IDLE.value})
+        elif newest.eventID == Events.DRAW_START_EXECUTION.value:
+            payload = json.loads(newest.payload)
+            statusList.append({"Recipe": payload["Recipe"]})
+            statusList.append({"PenColor": payload["PenColor"]})
+            statusList.append({"Status": RobotStatus.DRAWING.value})
+        else:
+            statusList.append({"Status": RobotStatus.IDLE.value})
+        statusList.append({"serverTime": newest.serverTime})
         return statusList
 
     def checkForDrawingNotEnded(self, startDrawEvent, endDrawEvent):
@@ -134,3 +159,6 @@ class MonitoringService:
 
     def getAllAlarms(self):
         return self.alarmDAO.getAllAlarms()
+
+    def getAllNewAlarms(self, alarmId):
+        return self.alarmDAO.getAllNewAlarms(alarmId)
