@@ -17,14 +17,14 @@ logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(asctime)s - %
                     datefmt='%Y-%m-%d %H:%M:%S')
 
 # Workstation
-w2BaseUrl = "http://192.168.2"
+w2BaseUrl = "http://192.168.9"
 ws = Workstation(w2BaseUrl, None)
 
 # Subscriber
 locPort = 5000
-serverAddress = "http://192.168.101.200:" + str(locPort)
+serverAddress = "http://192.168.102.201:" + str(locPort)
 subscriber = Subscriber(serverAddress)
-# subscriber.subscribeToAllEventsOfWsSimple(ws)
+subscriber.subscribeToAllEventsOfWsSimple(ws)
 
 # DB
 eventDAO = MonitoringEventDAO(False)
@@ -57,7 +57,7 @@ def index(wsId):
 @app.route('/rest/events', methods=['GET'])
 def getEvents():
     # logging.debug("Retrieving all the events...")
-    allEvents = eventDAO.get_all_events()
+    allEvents = monitoringService.getAllEvents()
     allEventsJson = json.dumps(allEvents)
     return allEventsJson
 

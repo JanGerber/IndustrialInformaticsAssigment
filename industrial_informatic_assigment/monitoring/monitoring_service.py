@@ -1,10 +1,12 @@
+import datetime
 import json
 from typing import List
 
+from industrial_informatic_assigment.enum.alarms import Alarms
 from industrial_informatic_assigment.enum.conveyor_status import ConveyorStatus
 from industrial_informatic_assigment.enum.events import Events
 from industrial_informatic_assigment.enum.robot_status import RobotStatus
-from industrial_informatic_assigment.monitoring import event_ws
+from industrial_informatic_assigment.monitoring.alarm import Alarm
 from industrial_informatic_assigment.monitoring.event_ws import EventWS
 from industrial_informatic_assigment.monitoring.monitoring_alarm_dao import MonitoringAlarmDAO
 from industrial_informatic_assigment.monitoring.monitoring_event_dao import MonitoringEventDAO
@@ -40,7 +42,7 @@ class MonitoringService:
 
         return WorkstationStatus(statusZ1, statusZ2, statusZ3, statusZ4, statusZ5, statusRobot)
 
-    def getStatusOfZone(self, event: event_ws):
+    def getStatusOfZone(self, event: EventWS):
         status = []
         if event is None:
             status.append({"PalletID": "-"})
@@ -49,7 +51,7 @@ class MonitoringService:
         else:
             payload = json.loads(event.payload)
             status.append({"PalletID": payload["PalletID"]})
-            status.append({"serverTime": event.serverTime})
+            status.append({"serverTime": str(event.serverTime)})
             if payload["PalletID"] == -1 or payload["PalletID"] == "-1":
                 status.append({"Status": ConveyorStatus.FREE.value})
             else:
@@ -67,16 +69,16 @@ class MonitoringService:
         eventDrawStart = self.eventsDAO.getLastEvent(Events.DRAW_START_EXECUTION)
         eventDrawEnd = self.eventsDAO.getLastEvent(Events.DRAW_END_EXECUTION)
         self.checkForDrawingNotEnded(eventDrawStart, eventDrawEnd)
-        self.checkForPenChangeNotEnded()
-        self.checkForUnkownPosAfterZ1()
-        self.checkForUnkownPosAfterZ2()
-        self.checkForUnkownPosAfterZ3()
-        self.checkForUnkownPosAfterZ4()
-        self.checkForNotMovingZ1()
-        self.checkForNotMovingZ2()
-        self.checkForNotMovingZ3()
-        self.checkForNotMovingZ4()
-        self.checkForNotMovingZ5()
+        self.checkForPenChangeNotEnded(eventPenStart, eventPenEnd)
+        self.checkForUnkownPosAfterZ1(eventZ1, eventZ2, eventZ4)
+        self.checkForUnkownPosAfterZ2(eventZ2, eventZ3)
+        self.checkForUnkownPosAfterZ3(eventZ3, eventZ5)
+        self.checkForUnkownPosAfterZ4(eventZ4, eventZ5)
+        self.checkForNotMovingZ1(eventZ1)
+        self.checkForNotMovingZ2(eventZ2)
+        self.checkForNotMovingZ3(eventZ3)
+        self.checkForNotMovingZ4(eventZ4)
+        self.checkForNotMovingZ5(eventZ5)
 
     def getStatusOfRobot(self, eventPenStart: EventWS, eventPenEnd: EventWS, eventDrawStart: EventWS,
                          eventDrawEnd: EventWS):
@@ -121,44 +123,83 @@ class MonitoringService:
             statusList.append({"Status": RobotStatus.DRAWING.value})
         else:
             statusList.append({"Status": RobotStatus.IDLE.value})
-        statusList.append({"serverTime": newest.serverTime})
+        statusList.append({"serverTime": str(newest.serverTime)})
         return statusList
 
-    def checkForDrawingNotEnded(self, startDrawEvent, endDrawEvent):
+    def checkForDrawingNotEnded(self, startDrawEvent: EventWS, endDrawEvent: EventWS):
+        if startDrawEvent is None:
+            return
+        serverTime = datetime.datetime.now()
+        timediff = int((serverTime - startDrawEvent.serverTime).total_seconds())
+        if endDrawEvent is not None:
+            if endDrawEvent.serverTime > startDrawEvent.serverTime or timediff < 120:
+                return
+        if self.alarmDAO.testAlarmExist(Alarms.DRAWING_NOT_ENDED, startDrawEvent.id):
+            return
+        description = "The drawing(" + str(startDrawEvent.payload) + ") started at " + str(
+            startDrawEvent.serverTime) + " has not been finished yet."
+        alarm = Alarm(Alarms.DRAWING_NOT_ENDED.name, description, serverTime, startDrawEvent.id)
+        self.alarmDAO.insertAlarm(alarm)
+
+    def checkForPenChangeNotEnded(self, eventPenStart: EventWS, eventPenEnd: EventWS):
+        if eventPenStart is None:
+            return
+        serverTime = datetime.datetime.now()
+        timediff = int((serverTime - eventPenStart.serverTime).total_seconds())
+        if eventPenEnd is not None:
+            if eventPenEnd.serverTime > eventPenEnd.serverTime or timediff < 60:
+                return
+        if self.alarmDAO.testAlarmExist(Alarms.PEN_CHANGE_NOT_ENDED, eventPenStart.id):
+            return
+        description = "The pen change(" + str(eventPenStart.payload) + ") started at " + str(
+            eventPenStart.serverTime) + " has not been finished yet."
+        alarm = Alarm(Alarms.PEN_CHANGE_NOT_ENDED.name, description, serverTime, eventPenStart.id)
+        self.alarmDAO.insertAlarm(alarm)
+
+    def checkForUnkownPosAfterZ1(self, eventZ1: EventWS, eventZ2: EventWS, eventZ4: EventWS):
         pass
 
-    def checkForPenChangeNotEnded(self):
+    def checkForUnkownPosAfterZ2(self, eventZ2: EventWS, eventZ3: EventWS):
         pass
 
-    def checkForUnkownPosAfterZ1(self):
+    def checkForUnkownPosAfterZ3(self, eventZ3: EventWS, eventZ5: EventWS):
         pass
 
-    def checkForUnkownPosAfterZ2(self):
+    def checkForUnkownPosAfterZ4(self, eventZ4: EventWS, eventZ5: EventWS):
         pass
 
-    def checkForUnkownPosAfterZ3(self):
+    def checkForNotMovingZ1(self, eventZ1: EventWS):
         pass
 
-    def checkForUnkownPosAfterZ4(self):
+    def checkForNotMovingZ2(self, eventZ2: EventWS):
         pass
 
-    def checkForNotMovingZ1(self):
+    def checkForNotMovingZ3(self, eventZ3: EventWS):
         pass
 
-    def checkForNotMovingZ2(self):
+    def checkForNotMovingZ4(self, eventZ4: EventWS):
         pass
 
-    def checkForNotMovingZ3(self):
-        pass
-
-    def checkForNotMovingZ4(self):
-        pass
-
-    def checkForNotMovingZ5(self):
+    def checkForNotMovingZ5(self, eventZ5: EventWS):
         pass
 
     def getAllAlarms(self):
-        return self.alarmDAO.getAllAlarms()
+        alarms = self.alarmDAO.getAllAlarms()
+        for a in alarms:
+            a["serverTime"] = str(
+                a["serverTime"])  # FIXME vielleicht sollte man einfach ein richtiges Framework verwenden
+        return alarms
+
+    def getAllEvents(self):
+        events = self.eventsDAO.get_all_events()
+        for e in events:
+            e["serverTime"] = str(
+                e["serverTime"])  # FIXME vielleicht sollte man einfach ein richtiges Framework verwenden
+        return events
 
     def getAllNewAlarms(self, alarmId):
-        return self.alarmDAO.getAllNewAlarms(alarmId)
+        alarms = self.alarmDAO.getAllNewAlarms(alarmId)
+        for a in alarms:
+            a["serverTime"] = str(
+                a["serverTime"])  # FIXME vielleicht sollte man einfach ein richtiges Framework verwenden
+        return alarms

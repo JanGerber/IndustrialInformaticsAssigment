@@ -123,18 +123,19 @@ class Orchestrator:
         pallet.status = PalletStatus.WAIT_FOR_MOVING
 
     def zone5ChangedEvent(self, palletId: int):
-        if palletId == -1 or palletId == str("-1"):
-            pallet = self.getPalletOnByStatus(PalletStatus.WAIT_FOR_REMOVAL)
-            if pallet is None:
-                return
-            self.ws.pallets.remove(pallet)
-            logging.debug("Orchestrator: remove Pallet")
-            return
         pallet = self.getPalletOnByStatus(PalletStatus.MOVING_TO_Z5)
         if pallet is None:
-            return
-        pallet.locationZone = Zone.Z5
-        pallet.status = PalletStatus.WAIT_FOR_REMOVAL
+            if palletId == -1 or palletId == str("-1"):
+                pallet = self.getPalletOnByStatus(PalletStatus.WAIT_FOR_REMOVAL)
+                if pallet is None:
+                    return
+                self.ws.pallets.remove(pallet)
+                logging.debug("Orchestrator: remove Pallet")
+        else:
+            pallet.locationZone = Zone.Z5
+            pallet.status = PalletStatus.WAIT_FOR_REMOVAL
+
+
 
     def testIfAnyPalletStatusIs(self, status: PalletStatus) -> bool:
         for pallet in self.ws.pallets:
@@ -152,7 +153,8 @@ class Orchestrator:
         for pallet in self.ws.pallets:
             if pallet.status == status:
                 return pallet
-        logging.error("Orchestrator: couldn't find pallet with that status: " + str(status.name))
+        logging.info("Orchestrator: couldn't find pallet with that status: " + str(status.name))
+        return None
 
     def drawingStartEvent(self):
         pass

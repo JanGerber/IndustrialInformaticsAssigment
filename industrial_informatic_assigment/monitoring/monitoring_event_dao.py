@@ -11,9 +11,11 @@ class MonitoringEventDAO:
 
     def __init__(self, inMemory):
         if inMemory:
-            self.conn = sqlite3.connect(':memory:', check_same_thread=False)
+            self.conn = sqlite3.connect(':memory:', check_same_thread=False,
+                                        detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         else:
-            self.conn = sqlite3.connect('monitoring.db', check_same_thread=False)
+            self.conn = sqlite3.connect('monitoring.db', check_same_thread=False,
+                                        detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
 
         self.conn.row_factory = lambda c, r: dict(zip([col[0] for col in c.description], r))
         self.lock = Lock()
