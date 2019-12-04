@@ -2,14 +2,14 @@ import logging
 import time
 import uuid
 
+from industrial_informatic_assigment.enum.pallet_status import PalletStatus
+from industrial_informatic_assigment.enum.status_code import StatusCode
+from industrial_informatic_assigment.enum.zone import Zone
 from industrial_informatic_assigment.exceptions.workstation_exception import WorkstationError
 from industrial_informatic_assigment.orchestration.orchestrator_status import OrchestratorStatus
 from industrial_informatic_assigment.workstation.pallet import Pallet
-from industrial_informatic_assigment.enum.pallet_status import PalletStatus
 from industrial_informatic_assigment.workstation.phone import Phone
-from industrial_informatic_assigment.enum.status_code import StatusCode
 from industrial_informatic_assigment.workstation.workstation import Workstation
-from industrial_informatic_assigment.enum.zone import Zone
 
 
 class Orchestrator:
@@ -134,8 +134,6 @@ class Orchestrator:
         else:
             pallet.locationZone = Zone.Z5
             pallet.status = PalletStatus.WAIT_FOR_REMOVAL
-
-
 
     def testIfAnyPalletStatusIs(self, status: PalletStatus) -> bool:
         for pallet in self.ws.pallets:

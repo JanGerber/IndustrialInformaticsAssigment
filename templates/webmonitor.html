@@ -23,6 +23,31 @@
             z-index: 9999;
             margin: 5px;
         }
+
+        [type="date"] {
+            background: #fff url(https://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/calendar_2.png) 97% 50% no-repeat;
+        }
+
+        [type="date"]::-webkit-inner-spin-button {
+            display: none;
+        }
+
+        [type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 0;
+        }
+
+        label {
+            display: block;
+        }
+
+        input {
+            border: 1px solid #c4c4c4;
+            border-radius: 5px;
+            background-color: #fff;
+            padding: 3px 5px;
+            box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.1);
+            width: 190px;
+        }
     </style>
 </head>
 
@@ -125,6 +150,16 @@
                     Events
                 </div>
                 <div class="card-body">
+                    <div class="form-inline">
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label class="sr-only" for="eventsDate">Events Date</label>
+                            <input class="form-control" id="eventsDate" name="eventsDate" type="date">
+                        </div>
+                        <button class="btn btn-primary btn-sm mb-2" onclick="getAllEventsButtonsByDate()">Get Events
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
                     <table class="table table-sm table-hover">
                         <thead class="thead-light">
                         <tr>
@@ -168,7 +203,7 @@
 <!-- Footer -->
 <footer class="py-4 bg-dark mt-4">
     <div class="container">
-        <p class="m-0 text-center text-white">Copyright &copy; Jan Gerber, Radim Karni&scaron;, Bernhard Mayrhofer</p>
+        <p class="m-0 text-center text-white">Copyright &copy; Jan Gerber and Radim Karni&scaron;</p>
         <p class="m-0 text-center text-white">Industrial Informatics 2019</p>
     </div>
     <!-- /.container -->
@@ -176,23 +211,42 @@
 <script>
     let currentAlarmId = 0;
     let alarmLoadFirst = false;
+    let jsonEvents = {'timestampnewer': ''};
 
-    function getAllEvents() {
-        $.get("/rest/events", function (data) {
-            let events = JSON.parse(data);
-            txt = "";
-            for (x in events) {
-                let date = new Date(events[x]["serverTime"]);
-                txt += "<tr>";
-                txt += "<th scope=\"row\">" + events[x]['id'] + "</th>";
-                txt += "<td>" + events[x]['eventID'] + "</td>";
-                txt += "<td>" + events[x]['payload'] + "</td>";
-                txt += "<td>" + date.toISOString() + "</td>";
-                txt += "</tr>"
+    function getEvents() {
+        $.ajax({
+            type: "POST",
+            url: "/rest/events",
+            contentType: 'application/json',
+            data: JSON.stringify(jsonEvents),
+            success: function (response) {
+                let events = JSON.parse(response);
+                txt = "";
+                for (x in events) {
+                    let date = new Date(events[x]["serverTime"]);
+                    txt += "<tr>";
+                    txt += "<th scope=\"row\">" + events[x]['id'] + "</th>";
+                    txt += "<td>" + events[x]['eventID'] + "</td>";
+                    txt += "<td>" + events[x]['payload'] + "</td>";
+                    txt += "<td>" + date.toISOString() + "</td>";
+                    txt += "</tr>"
+                }
+                document.getElementById("eventData").innerHTML = txt;
             }
-            document.getElementById("eventData").innerHTML = txt;
-
         });
+    }
+
+
+    function getAllEventsButtonsByDate() {
+        let dateValue = document.getElementById("eventsDate").value;
+        console.log(dateValue);
+        if (dateValue === "") {
+            jsonEvents = {'timestampnewer': ''}
+        } else {
+            date = Date.parse(document.getElementById("eventsDate").value);
+            jsonEvents = {'timestampnewer': date};
+        }
+        getEvents()
     }
 
     function getAllAlarms() {
@@ -220,6 +274,7 @@
 
         });
     }
+
 
     function getCurrentStatus() {
         $.get("/rest/ws/status", function (data) {
@@ -306,7 +361,7 @@
     }
 
     window.setInterval(function () {
-        getAllEvents();
+        getEvents();
         getCurrentStatus();
         getAllAlarms();
         if (alarmLoadFirst) {

@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 from typing import List
 
 from industrial_informatic_assigment.enum.alarms import Alarms
@@ -70,9 +71,9 @@ class MonitoringService:
         eventDrawEnd = self.eventsDAO.getLastEvent(Events.DRAW_END_EXECUTION)
         self.checkForDrawingNotEnded(eventDrawStart, eventDrawEnd)
         self.checkForPenChangeNotEnded(eventPenStart, eventPenEnd)
-        self.checkForUnkownPosAfterZ1(eventZ1, eventZ2, eventZ4)
-        self.checkForUnkownPosAfterZ2(eventZ2, eventZ3)
-        self.checkForUnkownPosAfterZ3(eventZ3, eventZ5)
+        self.checkForUnknownPosAfterZ1(eventZ1, eventZ2, eventZ4)
+        self.checkForUnknownPosAfterZ2(eventZ2, eventZ3)
+        self.checkForUnknownPosAfterZ3(eventZ3, eventZ5)
         self.checkForUnkownPosAfterZ4(eventZ4, eventZ5)
         self.checkForNotMovingZ1(eventZ1)
         self.checkForNotMovingZ2(eventZ2)
@@ -156,17 +157,89 @@ class MonitoringService:
         alarm = Alarm(Alarms.PEN_CHANGE_NOT_ENDED.name, description, serverTime, eventPenStart.id)
         self.alarmDAO.insertAlarm(alarm)
 
-    def checkForUnkownPosAfterZ1(self, eventZ1: EventWS, eventZ2: EventWS, eventZ4: EventWS):
-        pass
+    def checkForUnknownPosAfterZ1(self, eventZ1: EventWS, eventZ2: EventWS, eventZ4: EventWS):
+        if eventZ1 is None:
+            return
+        payloadZ1 = json.loads(eventZ1.payload)
+        palletIdZ1 = payloadZ1["PalletID"]
+        if str(palletIdZ1) != "-1":
+            return
+        serverTime = datetime.datetime.now()
+        if eventZ2 is not None:
+            timediff = int((serverTime - eventZ1.serverTime).total_seconds())
+            if eventZ1.serverTime < eventZ2.serverTime or timediff < 20:
+                return
+        if eventZ4 is not None:
+            timediff = int((serverTime - eventZ4.serverTime).total_seconds())
+            if eventZ1.serverTime < eventZ4.serverTime or timediff < 20:
+                return
 
-    def checkForUnkownPosAfterZ2(self, eventZ2: EventWS, eventZ3: EventWS):
-        pass
+        if self.alarmDAO.testAlarmExist(Alarms.UNKNOWN_POS_AFTER_Z1, eventZ1.id):
+            return
+        description = "The moving from Zone 1 to Zone 2/4 has not been finished yet. (started at: " + str(
+            eventZ1.serverTime) + ")"
+        alarm = Alarm(Alarms.UNKNOWN_POS_AFTER_Z1.name, description, serverTime, eventZ1.id)
+        self.alarmDAO.insertAlarm(alarm)
 
-    def checkForUnkownPosAfterZ3(self, eventZ3: EventWS, eventZ5: EventWS):
-        pass
+    def checkForUnknownPosAfterZ2(self, eventZ2: EventWS, eventZ3: EventWS):
+        if eventZ2 is None:
+            return
+        payloadZ1 = json.loads(eventZ2.payload)
+        palletIdZ1 = payloadZ1["PalletID"]
+        if str(palletIdZ1) != "-1":
+            return
+        serverTime = datetime.datetime.now()
+        if eventZ3 is not None:
+            timediff = int((serverTime - eventZ2.serverTime).total_seconds())
+            if eventZ2.serverTime < eventZ3.serverTime or timediff < 20:
+                return
+
+        if self.alarmDAO.testAlarmExist(Alarms.UNKNOWN_POS_AFTER_Z2, eventZ2.id):
+            return
+        description = "The moving from Zone 2 to Zone 3 has not been finished yet. (started at: " + str(
+            eventZ2.serverTime) + ")"
+        alarm = Alarm(Alarms.UNKNOWN_POS_AFTER_Z1.name, description, serverTime, eventZ2.id)
+        self.alarmDAO.insertAlarm(alarm)
+
+    def checkForUnknownPosAfterZ3(self, eventZ3: EventWS, eventZ5: EventWS):
+        if eventZ3 is None:
+            return
+        payloadZ1 = json.loads(eventZ3.payload)
+        palletIdZ1 = payloadZ1["PalletID"]
+        if str(palletIdZ1) != "-1":
+            return
+        serverTime = datetime.datetime.now()
+        if eventZ3 is not None:
+            timediff = int((serverTime - eventZ3.serverTime).total_seconds())
+            if eventZ3.serverTime < eventZ5.serverTime or timediff < 20:
+                return
+
+        if self.alarmDAO.testAlarmExist(Alarms.UNKNOWN_POS_AFTER_Z3, eventZ3.id):
+            return
+        description = "The moving from Zone 3 to Zone 5 has not been finished yet. (started at: " + str(
+            eventZ3.serverTime) + ")"
+        alarm = Alarm(Alarms.UNKNOWN_POS_AFTER_Z1.name, description, serverTime, eventZ3.id)
+        self.alarmDAO.insertAlarm(alarm)
 
     def checkForUnkownPosAfterZ4(self, eventZ4: EventWS, eventZ5: EventWS):
-        pass
+        if eventZ4 is None:
+            return
+        payloadZ1 = json.loads(eventZ4.payload)
+        palletIdZ1 = payloadZ1["PalletID"]
+        if str(palletIdZ1) != "-1":
+            return
+        serverTime = datetime.datetime.now()
+        if eventZ5 is not None:
+            timediff = int((serverTime - eventZ4.serverTime).total_seconds())
+            if eventZ4.serverTime < eventZ5.serverTime or timediff < 20:
+                return
+
+        if self.alarmDAO.testAlarmExist(Alarms.UNKNOWN_POS_AFTER_Z4, eventZ4.id):
+            return
+        description = "The moving from Zone 4 to Zone 5 has not been finished yet. (started at: " + str(
+            eventZ4.serverTime) + ")"
+        alarm = Alarm(Alarms.UNKNOWN_POS_AFTER_Z1.name, description, serverTime, eventZ4.id)
+        self.alarmDAO.insertAlarm(alarm)
 
     def checkForNotMovingZ1(self, eventZ1: EventWS):
         pass
@@ -203,3 +276,15 @@ class MonitoringService:
             a["serverTime"] = str(
                 a["serverTime"])  # FIXME vielleicht sollte man einfach ein richtiges Framework verwenden
         return alarms
+
+    def getEventsNewerThen(self, timestamp):
+        dt_object = datetime.datetime.fromtimestamp((timestamp / 1000) - 3600)
+        logging.debug(dt_object)
+        events = self.eventsDAO.getEventByTimestamp(dt_object)
+        for e in events:
+            e["serverTime"] = str(
+                e["serverTime"])  # FIXME vielleicht sollte man einfach ein richtiges Framework verwenden
+        return events
+
+    def insert_event(self, eventDic):
+        self.eventsDAO.insert_event(eventDic)

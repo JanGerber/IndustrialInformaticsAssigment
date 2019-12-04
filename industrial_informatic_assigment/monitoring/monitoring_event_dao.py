@@ -65,3 +65,11 @@ class MonitoringEventDAO:
             return None
         return EventWS(eventDict["id"], eventDict["eventID"], eventDict["ws"], eventDict["senderID"],
                        eventDict["payload"], eventDict["serverTime"])
+
+    def getEventByTimestamp(self, dt_object):
+        self.lock.acquire(True)
+        self.c.execute("SELECT * FROM event WHERE event.serverTime > :timestamp",
+                       {"timestamp": dt_object})
+        events = self.c.fetchall()
+        self.lock.release()
+        return events

@@ -24,7 +24,7 @@ ws = Workstation(w2BaseUrl, None)
 locPort = 5000
 serverAddress = "http://192.168.102.201:" + str(locPort)
 subscriber = Subscriber(serverAddress)
-subscriber.subscribeToAllEventsOfWsSimple(ws)
+# subscriber.subscribeToAllEventsOfWsSimple(ws)
 
 # DB
 eventDAO = MonitoringEventDAO(False)
@@ -48,16 +48,20 @@ def index(wsId):
     serverTime = datetime.datetime.now()
     eventDic = {"eventID": eventDesc['id'], "ws": wsId, "senderID": eventDesc['senderID'],
                 "payload": eventDesc['payload'], "serverTime": serverTime}
-    eventDAO.insert_event(eventDic)
+    monitoringService.insert_event(eventDic)
 
     resp = json.dumps({'thank': 'yes'}), 200, {'ContentType': 'application/json'}
     return resp
 
 
-@app.route('/rest/events', methods=['GET'])
+@app.route('/rest/events', methods=['POST'])
 def getEvents():
     # logging.debug("Retrieving all the events...")
-    allEvents = monitoringService.getAllEvents()
+    events = request.json
+    if events["timestampnewer"] == "":
+        allEvents = monitoringService.getAllEvents()
+    else:
+        allEvents = monitoringService.getEventsNewerThen(events["timestampnewer"])
     allEventsJson = json.dumps(allEvents)
     return allEventsJson
 
