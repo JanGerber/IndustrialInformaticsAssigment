@@ -53,10 +53,11 @@ class MonitoringAlarmDAO:
 
     def testAlarmExist(self, alarmType: Alarms, eventId):
         self.lock.acquire(True)
-        self.c.execute("""SELECT * FROM alarm WHERE alarm.alarmtype LIKE :alarmType AND alarm.eventId LIKE :eventId""",
+        self.c.execute("""SELECT * FROM alarm WHERE alarm.alarmtype = :alarmType AND alarm.eventId = :eventId""",
                        {"alarmType": alarmType.name, "eventId": eventId})
         alarms = self.c.fetchall()
         self.lock.release()
+        logging.debug(len(alarms))
         if len(alarms) > 0:
             return True
         return False

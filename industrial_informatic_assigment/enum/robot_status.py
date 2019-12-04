@@ -5,4 +5,4 @@ class RobotStatus(Enum):
     IDLE = "Idle"
     DRAWING = "Drawing"
     PEN_CHANGE = "Pen changing"
-    UNKNOWN = "Unkown"
+    UNKNOWN = "Unknown"

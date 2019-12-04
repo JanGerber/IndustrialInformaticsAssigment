@@ -80,7 +80,8 @@ class Orchestrator:
 
     def drawingEndEvent(self):
         pallet = self.getPalletOnByStatus(PalletStatus.DRAWING)
-
+        if pallet is None:
+            return
         if not pallet.frameDone or not pallet.screenDone or not pallet.keyboardDone:
             pallet.status = PalletStatus.WAITING
             return

@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(asctime)s - %
 
 
 # Workstations
-w2BaseUrl = "http://192.168.9"
+w2BaseUrl = "http://192.168.2"
 w2 = Workstation(w2BaseUrl, None)
 
 # Subscribers

@@ -17,14 +17,14 @@ logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(asctime)s - %
                     datefmt='%Y-%m-%d %H:%M:%S')
 
 # Workstation
-w2BaseUrl = "http://192.168.9"
+w2BaseUrl = "http://192.168.2"
 ws = Workstation(w2BaseUrl, None)
 
 # Subscriber
 locPort = 5000
-serverAddress = "http://192.168.102.201:" + str(locPort)
+serverAddress = "http://192.168.101.200:" + str(locPort)
 subscriber = Subscriber(serverAddress)
-# subscriber.subscribeToAllEventsOfWsSimple(ws)
+subscriber.subscribeToAllEventsOfWsSimple(ws)
 
 # DB
 eventDAO = MonitoringEventDAO(False)

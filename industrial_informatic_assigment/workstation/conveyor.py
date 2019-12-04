@@ -1,5 +1,6 @@
 import logging
 import uuid
+from json import JSONDecodeError
 
 import requests
 
@@ -38,6 +39,7 @@ class Conveyor:
         if r.status_code != 200:
             logging.error("Conveyor: get zone status error (Z" + str(zone.value) + ")")
             raise WorkstationError("An error occurred when trying to move the pallet to the next zone.")
+
         reqMsg = r.json()
         palletID = reqMsg["PalletID"]
 
